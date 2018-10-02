@@ -1,0 +1,1040 @@
+\documentclass{cognito}
+\usepackage{lmodern}
+\usepackage{mathtools}
+
+\begin{document}
+
+% Some options
+\lstset{language=C}
+\lstset{mathescape=true}
+
+% For links use
+% \hyperref[note:Heuristic Minimax]{\emph{Heuristic Minimax}}
+
+\begin{note}{Algorithms and Data Structures}
+	\tags{Daniel Balle 2018}
+\end{note}
+
+% TODO
+% Stacks, Queue, HashMaps, Linked List...
+% Master theorem
+
+\begin{note}{Heap}
+	A heap is a nearly complete tree in which all parents have values
+	either larger (\emph{max-heap}) or lower (\emph{min-heap}) than their children.
+	\begin{mdframed}[linecolor=black!25!white]%%
+	\begin{tabular}{@{} c | c | c | c | c  @{}}
+		\hyperref[note:Heapify]{\bf heapify} &
+			\hyperref[note:Building a Heap]{\bf build} & \hyperref[note:Heapsort]{\bf heapsort} & \bf search & \bf modifiy \\
+		$\log n$ & $n$ & $n \log n$ & $n$ & $\log n$
+	\end{tabular}%
+	\end{mdframed}
+	\begin{remark} Heaps can be implemented efficiently using \hyperref[note:Space Efficient Trees]{\it arrays}. \end{remark}
+	\vspace{-5pt}
+	\tags{Data Structure, Heap}
+\end{note}
+
+\begin{note}{Space Efficient Trees}
+	Nearly complete binary trees can be implemented efficiently using an array and
+	the following helper functions.
+	\begin{largecode}
+ children(i) = { 2i + 1, 2i + 2 }
+ parent(i)   = $\lfloor$(i-1) / 2)$\rfloor$
+	\end{largecode}
+	\begin{remark} code for 0 indexes arrays. \end{remark}
+	\vspace{-5pt}
+	\tags{Data Structure, Tree}
+\end{note}
+
+
+\begin{note}{Heapify}
+	The \incode{heapify} function produces a new \hyperref[note:Heap]{\emph{heap}} given an arbitrary root to two
+	valid heaps in $O(\log n)$ by iteratively swapping the root with its largest child.
+	\begin{largecode}
+ node = largest(root, left(root), right(root))
+ if (root != node) {
+ 	exchange heap[root] and heap[node]
+ 	heapify(node)
+ }
+	\end{largecode}	
+	\begin{remark} This function is the core of \hyperref[note:Building a Heap]{\tt heap-build} and \hyperref[note:Heapsort]{\tt heapsort}. \end{remark}
+	\vspace{-5pt}
+	\tags{Data Structure, Heap}
+\end{note}
+
+
+\begin{note}{Building a Heap} %% TODO: explain tighter bound?
+	To build a \hyperref[note:Heap]{\it heap} in linear time $O(n)$ we iteratively apply \hyperref[note:Heapify]{\tt heapify}
+	from the parents of leafs, which are valid heaps, to the root.
+		\begin{largecode}
+ for i from parent(n) to 1
+ 	heapify(i)
+	\end{largecode}	
+	\vspace{-5pt}
+	\tags{Data Structure, Heap}
+\end{note}
+
+% TODO : priority queues
+
+\begin{note}{Heapsort}
+	\begin{mdframed}[linecolor=black!25!white]%%
+	\begin{tabular}{@{} c | c | c | c  @{}}
+		\bf average & \bf worst & \bf memory & \bf stable \\
+		$n \log n$ & $n \log n$ & $1$ & $\times$
+	\end{tabular}%
+	\end{mdframed}
+	\incode{heapsort} is a sorting algorithm using a \hyperref[note:Heap]{\it heap}
+	to iteratively extract the root and rebuilding a smaller heap using \hyperref[note:Heapify]{\tt heapify}.
+	\begin{largecode}
+ build-max-heap(A)
+ heap-end = n - 1
+ while (end > 0) {
+ 	swap A[heap-end] and A[0]
+	heap-end--
+	heapify(A, heap-end)  // restore heap property
+ }
+	\end{largecode}	
+	\vspace{-5pt}
+	\tags{Sorting, Comparison, Heap}
+\end{note}
+
+\begin{note}{Quicksort}
+	\begin{mdframed}[linecolor=black!25!white]%%
+	\begin{tabular}{@{} c | c | c | c  @{}}
+		\bf average & \bf worst & \bf memory & \bf stable \\
+		$n \log n$ & $n^2$ & $1$ & $\times$
+	\end{tabular}%
+	\end{mdframed}
+	\incode{quicksort} is a sorting algorithm progressively partitioning the array
+	into two subarrays containing only elements respectively smaller and larger than
+	some pivot.
+	\begin{largecode}
+ quicksort(A, lo, hi):        // if lo < hi
+ 	p = partition(A, lo, hi)  // pivot at correct spot
+	quicksort(A, lo, p-1)
+	quicksort(A, p+1, hi)
+	\end{largecode}	
+	Linear partitioning schemes such as \hyperref[note:Lomuto Partitioning]{\it Lomuto} and \hyperref[note:Hoare Partitioning]{\it Hoare}
+	produce an average running time $T(n) = O(n) + 2 T(n/2)$.
+	\begin{remark} Randomized quicksort also yields $O(n \log n)$ worst-case. \end{remark}
+	\vspace{-5pt}
+	\tags{Sorting, Comparison, Divide-and-conquer}
+\end{note}
+
+% TODO Tail recursive quick-sort
+
+\begin{note}{Lomuto Partitioning}
+	Lomuto is a linear partitioning scheme using the last element as the pivot
+	and progressively growing a region with only lower elements.
+	\begin{largecode}
+ p = A[hi]
+ i = lo  // A[lo..i-1] are elements below p
+ for (j from lo to hi - 1)  // A[i..j] are over p
+ 	if (A[j] < p)
+		exchange A[i] and A[j]
+		i += 1
+exchange A[i+1] and p
+return i+1
+	\end{largecode}
+	\begin{remark} Used in \hyperref[note:Quicksort]{\it quicksort} and \hyperref[note:Quickselect]{\it quickselect}.
+		By fist swapping a random element to the end we produce randomized quicksort.
+	\end{remark}
+	\begin{remark} Less efficient than \hyperref[note:Hoare Partitioning]{\it Hoare}.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Sorting, Quicksort, Partitioning}
+\end{note}
+
+\begin{note}{Hoare Partitioning}
+	Hoare is a \emph{linear} partitioning scheme in which two pointers travel towards each other
+	while exchanging elements that violate their respective relation to the pivot.
+	\begin{largecode}
+ p = A[lo]
+ i = lo - 1  // A[lo..i] are smaller than p
+ j = hi + 1 // A[j..hi] are larger than p
+ while True
+ 	do i++ while A[i] < p
+	do j-- while p < A[j]
+	if (i < j) exchange A[i] and A[j]
+	\end{largecode}
+	
+	\begin{remark} Used for \hyperref[note:Quicksort]{\it quicksort} and \hyperref[note:Quickselect]{\it quickselect}. \end{remark}
+	\vspace{-5pt}
+	\tags{Sorting, Quicksort, Partitioning}
+\end{note}
+
+\begin{note}{Dutch Flag Partitioning}
+	The Dutch Flag problem is solved by a \emph{linear} three-way partition operating with constant memory which iterates over the array
+	while progressively growing three regions.
+	\begin{largecode}
+ x = -1  // A[0..x] contains 0s
+ i = 0   // A[x+1...i-1] contains 1s
+ y = n   // A[y..n] contains 2s
+ while (i < y)
+ 	if (A[i] < 1) { x++; swap A[x] and A[i]; i++ }
+	if (A[i] = 1) { i++ }
+	if (A[i] > 1) { y--; swap A[y] and A[i] }
+	\end{largecode}
+	\begin{remark} Useful for \hyperref[note:Quicksort]{\it quicksort} with multiple duplicates. \end{remark}
+	\vspace{-5pt}
+	\tags{Sorting, Partitioning}
+\end{note}
+
+\begin{note}{Quickselect}
+	Quickselect or Hoare Selection uses a partitioning scheme such as \hyperref[note:Lomuto Partitioning]{\it Lomuto} or \hyperref[note:Hoare Partitioning]{\it Hoare}
+	to select the $k$-th element in linear $O(n)$ time.
+	\begin{largecode}
+select(A, lo, hi, k):
+	if (lo == hi) return A[lo]
+	p = partition(A, lo, hi)  // pivot at correct spot
+	if (p == k) return A[p]
+	else if (p < k) return select(A, p+1, hi, k)
+	else return select(A, lo, p-1, k)
+	\end{largecode}
+	A pivot selection strategy such as \emph{median-of-medians} can be used.
+	\begin{remark} Worst case $O(n^2)$ as for \hyperref[note:Quicksort]{\it quicksort}.
+		Constant memory overhead under tail call optimization or iteration.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Sorting, Quicksort, Partitioning, Selection}
+\end{note}
+
+%TODO Pivot Selection (https://en.wikipedia.org/wiki/Quicksort#Choice_of_pivot)
+
+\begin{note}{Mergesort}
+	\begin{mdframed}[linecolor=black!25!white]%%
+	\begin{tabular}{@{} c | c | c | c  @{}}
+		\bf average & \bf worst & \bf memory & \bf stable \\
+		$n \log n$ & $n \log n$ & $n$ & \checkmark
+	\end{tabular}%
+	\end{mdframed}
+	Mergesort is a stable sorting algorithm recursively sorting two subarrays
+	of equal size before merging them.
+	\begin{largecode}
+merge-sort(A, lo, hi):
+	q = $\lfloor$(lo+hi)/2$\rfloor$
+	merge-sort(A, lo, q)
+	merge-sort(A, q+1, hi)
+	merge(A, lo, hi, q)
+	\end{largecode}
+	Linear merging can be performed with $O(n)$ memory and sentinel cards.
+	{\tt merge-sort} thus has running time $T(n) = 2T(n/2) + O(n)$.
+
+	\begin{remark} Practical for multi-threaded sorting.\end{remark}\vspace{-5pt}
+	\tags{Sorting, Comparison, Divide-and-conquer}
+\end{note}
+
+\begin{note}{Counting Sort}
+	\begin{mdframed}[linecolor=black!25!white]%%
+	\begin{tabular}{@{} c | c | c  @{}}
+		\bf running time & \bf memory & \bf stable \\
+		$n + k$ & $n + k$ & \checkmark
+	\end{tabular}%
+	\end{mdframed}
+	Counting sort is a stable integer sorting algorithm for a known range $[0, k]$
+	placing elements based on their prefix sum.
+	%which determins for each element how many elements are smaller.
+	\begin{largecode}
+ for (i from 1 to A.length) C[A[i]] += 1 // occurences
+ for (j from 1 to k) C[j] += C[j-1] // prefix sum
+ for (i from A.length to 1)
+ 	B[C[A[i]]] = A[i]  // put A[i] at position C[A[i]]
+	C[A[i]] -= 1
+	\end{largecode}
+	\begin{remark} Using both 0 and 1 indexed array. Due to being stable, counting sort can be used for \hyperref[note:Radix Sort]{radix sort}.\end{remark}
+	\begin{remark} \emph{Prefix} sums can be very useful in subarray problems.
+	\end{remark}\vspace{-5pt}
+	\tags{Sorting, Integer Sorting}
+\end{note}
+
+\begin{note}{Radix Sort}
+	\begin{mdframed}[linecolor=black!25!white]%%
+	\begin{tabular}{@{} c | c | c   @{}}
+		\bf running time & \bf memory & \bf stable \\
+		$d (n+k)$ & $n + k$ & \checkmark
+	\end{tabular}%
+	\end{mdframed}
+	Radix sort is an integer sorting algorithm using \hyperref[note:Counting Sort]{\it counting sort}
+	to sort elements for every digit, beginning with the \emph{least-significant}.
+\begin{largecode}
+for (i from 1 to d)
+	stable-digit-sort(A, i) // digit 1 is the LSD
+\end{largecode}
+	\begin{remark} The underlying sorting algorithm needs to be stable.\end{remark}\vspace{-5pt}
+	\tags{Sorting, Integer Sorting}
+\end{note}
+
+\begin{note}{Bucket Sort}
+	Bucket sort is a sorting algorithm assuming the input is drawn from a uniform distribution over $[0, 1)$.
+	Distribute the input numbers into $n$ equal-sized subintervals and sort each.
+	\begin{largecode}
+ for (i in 1 to n) insert A[i] into list B[$\lfloor$n A[i]$\rfloor$]
+ for (i in 1 to n) sort list B[i]
+ return B[0], ..., B[n-1]
+	\end{largecode}
+	\begin{remark} Each bucket $i$ is expected to contain few elements $n_i$, yielding linear $O(n)$ average running time.
+	$$ E\left[T(n)\right] = \Theta(n) + \sum_i^{n-1} O(E[n_i^2])$$
+	\end{remark}\vspace{-10pt}
+	\tags{Sorting, Linear Sorting}
+\end{note}
+
+% TODO Simultaneous Min-Max
+% TODO median-of-medians
+
+\begin{note}{Breadth-First Search}
+	\begin{mdframed}[linecolor=black!25!white]
+		\bf running time $O(V + E)$ or $O(b^{d+1})$
+	\end{mdframed}
+	\incode{BFS} is a graph traversal and search algorithm progressively expanding the \emph{shallowest} nodes using a FIFO queue for the frontier.
+	\begin{largecode}
+ frontier = queue(s)
+ discovered = {s : s}         // distance optional
+ while (frontier):
+ 	u = frontier.dequeue()
+	for (v in u.neighbors if v not in discovered)
+		frontier.append(v)
+		discovered[v] = u
+		if (v == t) return t  // optional
+	\end{largecode}%
+	\begin{remark} Produces a \emph{breadth-first tree}.
+	BFS can find the \emph{shortest path} if path cost is a non-decreasing function of depth. \end{remark}
+	\vspace{-5pt}
+	\tags{Graphs, Searching, Traversing}
+\end{note}
+
+% TODO mention that it can test bipartitness
+
+\begin{note}{Depth-First Search}
+	\begin{mdframed}[linecolor=black!25!white]
+		\bf running time $O(V + E)$
+	\end{mdframed}
+	\incode{DFS} is a graph traversal and search algorithm progressively expanding the \emph{deepest} nodes in the frontier.
+	\begin{largecode}
+ dfs-visit(u):
+	u.discovery = ++time
+	for (v in u.neighbors if v.parent = $\emptyset$)
+		v.parent = u
+		dfs-visit(v)
+	u.finish = ++time
+ for (u in G.V if v.parent = $\emptyset$) dfs-visit(u)
+	\end{largecode}%
+	\begin{remark} A non-recursive implementation uses a stack. \end{remark}
+	\begin{remark}
+	Applications include \hyperref[note:Topological Sort]{\it topological sort}
+	and finding strongly connected \hyperref[note:Strongly Connected Components]{\it components}. \end{remark}
+	\vspace{-5pt}
+	\tags{Graphs, Searching, Traversing}
+\end{note}
+
+\begin{note}{Topological Sort}
+	\incode{topological-sort} produces a linear ordering $\prec$ in a directed acyclic graph $G$
+	such that $(u, v) \in E \implies u \prec v$, using decreasing finishing times of a \hyperref[note:Depth-First Search]{\it depth-first} forest.
+	
+	\begin{largecode}
+ topological-visit(u):
+	u.discovered = true
+	for (v in u.neighbors if not v.discovered)
+		topological-visit(v)
+	ordering.prepend(u)
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Graphs, Searching, Traversing, DFS}
+\end{note}
+
+\begin{note}{Strongly Connected Components}
+	\hyperref[note:Depth-First Search]{\it Depth-first search} can be used to identify strongly connected components
+	by being applied to the transposed graph $G^\mathsf{T}$.
+	\begin{largecode}
+ dfs(G) to produce u.f
+ dfs(G$^\mathsf{T}$) but create each tree by decreasing u.f
+ each tree is a strongly connected component
+	\end{largecode}%
+	\begin{remark} $G^\mathsf{T}$ simply contains all edges of $G$ reversed.\end{remark}\vspace{-5pt}
+	\tags{Graphs, Searching, Traversing, DFS}
+\end{note}
+
+%% Bipartite stuff?
+
+\begin{note}{Graphs in AI}
+	Refer to the \textbf{Artificial Intelligence} \noteref notes for more details on both uninformed and \emph{informed} search
+	algorithms.
+	
+	\tags{Graphs, Searching, AI}
+\end{note}
+
+% TODO minimum spanning tree MST (Prim & Kruskal)
+
+\begin{note}{Bellman-Ford Algorithm}
+	\begin{mdframed}[linecolor=black!25!white]
+		\bf running time $\Theta(V E)$
+	\end{mdframed}
+	\incode{bellman-ford} solves single-source shortest-path problems for any directed graph through relaxation, and detects negative cycles.
+	\begin{largecode}
+ u.d = $\infty$ for (u in V) but s.d = 0
+ for (i from 1 to |V|-1)
+	for (edge (u, v) in E)
+		relax(u, v)  // can v.d be improved through u?
+
+ for (edge (u, v) in E)
+	if v.d > u.d + w(u, v) raise CycleException
+	\end{largecode}
+	\begin{remark} Relaxation is used greedily in \hyperref[note:Dijkstra's Algorithm]{\it Dijkstra's} algorithm.\end{remark}
+	\vspace{-5pt}
+	\tags{Graphs, Searching, Shortest Path, Single-source, Relaxation, Negative cycles}
+\end{note}
+
+\begin{note}{Dijkstra's Algorithm}
+	\begin{mdframed}[linecolor=black!25!white]
+		\bf running time $O(V^2)$ or $O(E + V \log V)$
+	\end{mdframed}
+	\incode{dijkstra} solves single-source shortest-path problems for directed graphs with non-negative weights using \emph{greedy} relaxation.
+		\begin{largecode}
+ u.d = $\infty$ for (u in V) but s.d = 0
+ S = $\emptyset$  // set of finished vertices
+ while (V-S)
+	u = extract-min(V-S)  // min u.d in V-S
+	if (u == t) return t  // optional
+	S = S $\cup$ { u }
+	for (v in u.neighbors) relax(u, v)
+	\end{largecode}
+\begin{remark} Similar to \hyperref[note:Breadth-First Search]{\it BFS} and \emph{uniform cost search} from \textbf{AI} \noteref notes. \end{remark}
+\begin{remark} The fastest running time is achieved using a min-priority queue with a Fibonacci heap. \end{remark}\vspace{-5pt}
+	\tags{Graphs, Searching, Shortest Path, Single-source, Relaxation, Greedy}
+\end{note}
+
+\begin{note}{DAG Shortest Path}
+	\begin{mdframed}[linecolor=black!25!white]
+		\bf running time $O(V + E)$
+	\end{mdframed}
+	The single-source shortest-path problem for directed acyclic graphs can be solved linearly using \hyperref[note:Topological Sort]{\it topological sort}.
+	\begin{largecode}
+ u.d = $\infty$ for (u in V) but s.d = 0
+ for (u in topological-sort(G))
+	for (v in u.neighbors)
+		relax(u, v)  // can v.d be improved through u?
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Graphs, Searching, Shortest Path, Single-source, Relaxation}
+\end{note}
+
+\begin{note}{Floyd-Warshall Algorithm}
+	\begin{mdframed}[linecolor=black!25!white]
+		\bf running time $O(V^3)$
+	\end{mdframed}
+	\incode{floyd-warshall} solves all-pairs shortest-path problems for graphs without negative weight cycles using dynamic programming.
+	Define $d_{ij}^{k}$ as the shortest path from $i$ to $j$ using vertices $\{1, ..., k\}$.
+	$$
+		d_{ij}^k = \min \left\{w_{ij}, d_{ij}^{k-1}, d_{ik}^{k-1} + d_{kj}^{k-1}\right\}
+	$$
+%	\begin{largecode}
+% for (k from 1 to n)
+% 	for (i from 1 to n, j from 1 to n)
+%		$d_{ij}^k$ = min($d_{ij}^{k-1}$, $d_{ik}^{k-1} + d_{kj}^{k-1}$)
+%	\end{largecode}
+	\vspace{-10pt}
+	\tags{Graphs, Searching, Shortest Path, All-pairs, Dynamic Programming}
+\end{note}
+
+%% TODO : Maximum Flows
+
+\begin{note}{Huffman Code}
+	A Huffman code is an optimal \emph{prefix} scheme for a character coding problem.
+	The corresponding full binary tree is constructed by \emph{greedily} merging leaves with minimal frequency.
+	
+	\begin{largecode}
+ Q = C  // the characters
+ for (i from 1 to n-1)
+ 	create new node z
+	z.left = x = Q.extract-min()  // 0
+	z.right = y = Q.extract-min() // 1
+	z.freq = x.freq + y.freq
+	Q.insert(z, z.freq)
+ return Q.extract-min()  // root
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Greedy, Coding}
+\end{note}
+
+\begin{note}{Rod Cutting Problem}
+	Given prices $p_i$ for a rod of length $i$, determine the highest revenue decomposition for
+	a rod of length $n$.
+	\begin{largecode}
+ input:    p = [1, 5, 8, 9], n = 4
+ solution: r = 10  // two pieces of length 2
+	\end{largecode}
+	\bf Solution \hyperref[note:Rod Cutting Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Rod Cutting Solution}
+	The \hyperref[note:Rod Cutting Problem]{\it rod-cutting} problem can be solved using dynamic programming
+	by exploiting optimal substructure.
+	The maximum price $r_n$ for a rod of length $n$ can be written as:
+	$$ r_n = \max_{1 \leq i \leq n} \{ p_i + r_{n-i} \} $$
+	A running time of $\Theta(n^2)$ is achieved by both the \hyperref[note:Memoized Rod Cutting]{\it memoized top-down} and
+	\hyperref[note:Bottom-Up Rod Cutting]{\it bottom-up} implementations.
+	
+	\tags{Dynamic Programming, Solution, Rod Cutting}
+\end{note}
+
+\begin{note}{Memoized Rod Cutting}
+	The top-down implementation \incode{rod-cut} with memoization to the \hyperref[note:Rod Cutting Problem]{\it rod-cutting} problem
+	 is written recursively but solutions to subproblems are remembered in \incode{r[i]}.
+	 
+	 \begin{largecode}
+ if (r[n] $\geq$ 0) return r[n]
+ q = 0
+ for (i from 1 to n)
+	q = max{q, p[i] + rod-cut(n - i)}
+ r[n] = q
+ return r[n]
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Dynamic Programming, Solution, Rod Cutting}
+\end{note}
+
+\begin{note}{Bottom-Up Rod Cutting}
+	The bottom-up implementation \incode{rod-cut} to the \hyperref[note:Rod Cutting Problem]{\it rod-cutting} problem
+	 iteratively solves subproblems of larger size. 
+	 
+	 \begin{largecode}
+ for (i from 1 to n)
+ 	q = -$\infty$
+	for (j from 1 to i)
+		q = max(q, p[j] + r[i - j])
+	r[i] = q
+ return r[n]
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Dynamic Programming, Solution, Rod Cutting}
+\end{note}
+
+\begin{note}{Longest Common Subsequence}
+	Given two sequences $X = \langle x_1, ..., x_n \rangle$ and $Y = \langle y_1, ..., y_m \rangle $, determine the maximum-length common subsequence $Z$ of $X$ and $Y$.
+	\begin{largecode}
+ input:    X = ABCBDAB, Y = BDCABA
+ solution: BCBA or BDAB  // 4
+	\end{largecode}
+	\bf Solution \hyperref[note:LCS Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{LCS Solution}
+	The \hyperref[note:Longest Common Subsequence]{\it longest common subsequence} problem can be solved using dynamic problem in $\Theta(mn)$.
+	Define $c_{ij}$ the length of the LCS of the prefix sequences $X_{1..i}$ and $Y_{1..j}$.
+	$$
+		c_{ij} = \begin{dcases}
+			c_{i-1,j-1} + 1 & \text{ if } x_i = x_j\\
+			\max\{ c_{i,j-1}, c_{i-1,j} \} & \text{ if } x_i \neq x_j
+		\end{dcases}
+	$$
+	For the optimal solution use auxiliary table $b_{ij} \in \{\uparrow, \nwarrow, \leftarrow \}$ to record
+	the optimal structure of $c_{ij}$ and backtrack from $b_{nm}$.
+	\tags{Dynamic Programming, Solution, Longest Common Subsequence}
+\end{note}
+
+% Other DP stuff
+% TODO Longest Palindrome Subsequence
+% TODO Longest Simple Path in DAG
+% TODO Edit Distance
+
+
+\begin{note}{Maximum Subarray Problem}
+	Given a one-dimensional array of numbers, determine the continuous subarray with maximum sum.
+	\begin{largecode}
+ input: [-2, 1, -3, 4, -1, 2, 1, -5, 4]
+ solution: 6  // [4, -1, 2, 1]
+	\end{largecode}
+	\bf Solution \hyperref[note:Kadane's Algorithm]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Kadane's Algorithm}
+	Kadane's algorithm is a linear $O(n)$ dynamic programming solution to the \hyperref[note:Maximum Subarray Problem]{\it maximum subarray} problem
+	which iteratively determines the maximum subarray $B_i$ {\it ending} at position $i$ using $B_{i-1}$.
+
+\begin{largecode}
+ bi = s = A[0]
+ for (i from 1 to n-1)
+ 	bi = max(bi + A[i], A[i])
+	s = max(s, bi)
+ return s
+\end{largecode}
+	\begin{remark} \incode{kadane} is an instance of a \hyperref[note:Sliding Window Method]{\it sliding-window} algorithm.\end{remark} \vspace{-5pt}
+	\tags{Dynamic Programming, Solution, Maximum Subarray}
+\end{note}
+
+\begin{note}{Longest Increasing Subsequence}
+	Given a one-dimensional array of numbers, determine the longest increasing subsequence.
+	\begin{largecode}
+ input: [10, 22, 9, 33, 21, 50, 41, 60, 80]
+ solution: 6  // [10, 22, 33, 50, 60, 80]
+	\end{largecode}	
+	
+	\bf Solution \hyperref[note:LIS Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{LIS Solution}
+	The \hyperref[note:Longest Increasing Subsequence]{\it longest increasing subsequence} problem can be solved
+	using dynamic programming. Define $x_i$ to be the smallest number terminating a LIS of length $i$.
+	\begin{largecode}
+ x[1] = A[0];  l = 1          // length of best LIS
+ for (n in A)
+ 	if (x[l] < n) x[++l] = n  // new LIS
+	else
+		i = candidate-lis(n)  // x[i-1] < n < x[i]
+		x[i] = n              // improve that sequence
+ return x[l]
+	\end{largecode}
+	\incode{candidate-lis} determines the longest LIS whose last element can be replaced by \incode{n}.
+	Since \incode{x} is \emph{sorted}, we use binary search.
+	\begin{remark} An alternate solution uses \incode{LIS[i]} as the length of the LIS ending at position \incode{i} for a running time $O(n^2)$.\end{remark} \vspace{-5pt}
+	\tags{Dynamic Programming, Solution, Longest Increasing Subsequence}
+\end{note}
+
+\begin{note}{Longest k-Sum Subarray}
+	Given a one-dimensional array of numbers \incode{A}, determine the longest subarray \incode{A[i..j]} summing to $k$.
+	\begin{largecode}
+ input: A = [3, -5, 8, -14, 2, 4, 12], k = -5
+ solution: 5  // [-5, 8, -14, 2, 4]
+	\end{largecode}	
+	
+	\bf Solution \hyperref[note:Longest k-Sum Subarray Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Longest k-Sum Subarray Solution}
+	The \hyperref[note:Longest k-Sum Subarray]{\it longest k-sum subarray} problem is solved in \emph{linear} time
+	by defining \incode{P[s]} as the smallest index $i$ such that subarray \incode{A[0..i]} has prefix sum $s$.
+	
+	\begin{largecode}
+ prefix = best = 0
+ P = {0 : -1}
+ for (i from 0 to n-1)
+ 	prefix += A[i]
+	missing = prefix - k
+	if (prefix not in P) P[prefix] = i
+	if (missing in P) best = max(best, i - P[missing])
+ return best
+	\end{largecode}
+	\begin{remark} Subarray \incode{A[p..i]} has sum $k$ where \incode{p = P[missing]}.
+	\end{remark}\vspace{-5pt}
+	\tags{Dynamic Programming, Solution, Subarray}
+\end{note}
+
+\begin{note}{Longest Substring Problem}
+	Given a string \incode{S}, determine the longest \emph{or shortest} substring \incode{S[i..j]} satisfying some criterion $C$.
+	\begin{largecode}
+ input: S = ababbcabaac
+ criterion: pangram D = {a, b, c}
+ solution: cab  // 3
+	\end{largecode}	
+	\vspace{-5pt}
+	\begin{example} Shortest pangram, longest substring without duplicates. \end{example}
+	\vspace{5pt}
+	\bf Solution \hyperref[note:Sliding Window Method]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Sliding Window Method}
+	The general \hyperref[note:Longest Substring Problem]{\it longest substring} problem can be solved in linear time using a
+	\emph{sliding window} technique, where two pointers extend or retract some substring \incode{S[i..j]} to satisfy $C$.
+	\begin{largecode}
+ for (j from 0 to n-1)     // shortest pangram
+ 	while (S[i..j] satisfies C)
+		is S[i..j] new best? ; i++
+	\end{largecode}
+	\vspace{-5pt}
+	\begin{largecode}
+ for (j from 0 to n-1)     // longest no duplicates
+ 	while (S[i..j] does not satisfy C) i++
+	is S[i..j] new best?
+	\end{largecode}
+	\begin{remark} Implementation depends on $C$ and length optimization.
+		Similar to \hyperref[note:Kadane's Algorithm]{\it Kadane's} algorithm.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Sliding Window, Solution, Longest Substring, Shortest Substring}
+\end{note}
+
+\begin{note}{0-1 Knapsack Problem}
+	Given sizes $s_i$ and values $v_i$ for $n$ items, determine the maximum value
+	a knapsack with capacity $k$ can carry.
+	\begin{largecode}
+ input: s, v = [(10, 60), (20, 100), (30, 120)]
+ capacity: k = 50
+ solution: 220  // item 2 and 3 
+	\end{largecode}
+	\bf Solution \hyperref[note:0-1 Knapsack Algorithm]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{0-1 Knapsack Algorithm}
+	The \hyperref[note:0-1 Knapsack Problem]{\it knapsack} problem can be solved using dynamic programming.
+	Define $d_{i,k}$ to be the optimal value for a knapsack of capacity $k$ using only items $\{1,..,i\}$.
+	$$
+		d_{i, k} = \max \{v_i +  d_{i-1, k - s_i}, d_{i-1, k} \}
+		%d(i, k) = \max \{v_i +  d(i-1, k - s_i), d(i-1, k) \}
+	$$
+	\vspace{-15pt}
+	\begin{largecode}
+for (j from 1 to k)
+	for (i from 1 to n)
+		d[i, j] = ...  // also check edge-cases
+	\end{largecode}
+	\begin{remark} Additional substructure dimension than the \hyperref[note:Rod Cutting Solution]{\it rod-cutting} solution
+		as each items can only be taken once.%\end{remark}
+	%Also see the fractional knapsack problem.
+	\end{remark} \vspace{-5pt}
+	\tags{Dynamic Programming, Knapsack, Solution, NP}
+\end{note}
+
+\begin{note}{Fractional Knapsack Problem}
+	Given sizes $s_i$ and values $v_i$ for $n$ items, determine the maximum value
+	a knapsack with capacity $k$ can carry if a \emph{fraction} of each item can be taken.
+	\begin{largecode}
+ input: s, v = [(10, 60), (20, 100), (30, 120)]
+ capacity: k = 50
+ solution: 240  // item 1, 2 and 2/3 of item 3
+	\end{largecode}
+	\bf Solution \hyperref[note:Greedy Knapsack Algorithm]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Greedy Knapsack Algorithm}
+	The \hyperref[note:Fractional Knapsack Problem]{\it fractional knapsack} problem can be solved using a \emph{greedy} strategy.
+	Order items by their volumetric value density $x_i = v_i/s_i$ and greedily pick as much as possible of each.
+
+	\begin{largecode}
+ sort items by v[i]/s[i]
+ i = 0; 
+ while (capacity > 0)
+ 	fraction = min(1, capacity/s[i])
+	capacity -= fraction * s[i]
+	i++
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Greedy, Knapsack, Solution}
+\end{note}
+
+\begin{note}{Interval Selection Problem}
+	Given starting times $s_i$ and finishing times $f_i$ of $n$ intervals,
+	determine the maximum subset of mutually compatible intervals.
+	\begin{largecode}
+ input: s = [1, 3, 0, 5, 8, 5]
+        f = [2, 4, 6, 7, 9, 9]
+ solution: {0, 1, 3, 4}
+	\end{largecode}
+	\bf Solution \hyperref[note:Interval Selection Algorithm]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Interval Selection Algorithm}
+	The \hyperref[note:Interval Selection Problem]{\it interval selection} problem can be solved by \emph{greedily}
+	picking compatible intervals by increasing finishing time $f_i$.
+	\begin{largecode}
+ sort intervals by finishing time $f_i$
+ S = {A[0]}
+ f = f[0]
+ for (i from 1 to n)
+ 	if (s[i] $\geq$ f)
+		S = S $\cup$ {A[i]}
+		f = f[i]
+ return S
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Greedy, Solution, Interval Selection}
+\end{note}
+
+\begin{note}{Interval Partitioning Problem}
+	Given starting times $s_i$ and finishing times $f_i$ of $n$ intervals,
+	determine the smallest partition into compatible intervals.
+	\begin{largecode}
+ input: s = [1, 3, 0, 5, 8, 5]
+        f = [2, 4, 6, 7, 9, 9]
+ solution: 3  // {2, 4} + {0, 1, 3} + {5}
+	\end{largecode}
+	\bf Solution \hyperref[note:Interval Partitioning Algorithm]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Interval Partitioning Algorithm}
+	The \hyperref[note:Interval Partitioning Problem]{\it interval partition} problem can be solved by \emph{greedily}
+	assigning intervals to the first compatible set by increasing start time $s_i$.
+	
+	\begin{largecode}
+ sort intervals by starting time $s_i$
+ r = []  // when resources become available
+ for (i from 0 to n-1)
+	for (j=0; j < r.length; j++)  // find compatible set
+		if (r[j] $\leq$ s[i]) break
+	assign i to j
+	r[j] = f[i]
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Greedy, Solution, Interval Partition}
+\end{note}
+
+\begin{note}{Next Greater Element}
+	Given a one-dimensional array, determine for each integer
+	the next greater element, i.e. the first larger element on its right.
+	
+	\begin{largecode}
+ input:    [5, 7, 4, 3, 6,  9, 2,  8]
+ solution: [7, 9, 6, 6, 9, -1, 8, -1]
+	\end{largecode}
+	\bf Solution \hyperref[note:NGE Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{NGE Solution}
+	The \hyperref[note:Next Greater Element]{\it next greater element} problem can be solved in linear time using a \emph{stack}
+	containing \emph{pending} integers. As we traverse the array we compare the current element
+	to the top unassigned elements.
+	\begin{largecode}
+ s = []  // contains (value, position)
+ for (i from 0 to n-1)
+ 	while (s && s.top()[0] < A[i])  // NGE for s.top
+		x = s.pop()
+		A[x[1]] = A[i]
+	s.push(A[i], i)
+while (s) A[s.pop()[1]] = -1
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Solution, Stack, Next Greater Element}
+\end{note}
+
+\begin{note}{Longest Balanced Subarray}
+	Given a binary array $\in \{0, 1\}^n$, determine the longest
+	continuous subarray containing an equal number of each digit.
+	
+	\begin{largecode}
+ input: [0, 1, 0, 0, 1, 1, 0, 0]
+ solution: [1, 0, 0, 1, 1, 0]  // 6
+	\end{largecode}
+	\bf Solution \hyperref[note:Balanced Subarray Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Balanced Subarray Solution}
+	To solve the \hyperref[note:Longest Balanced Subarray]{\it longest balanced subarray} problem
+	we use the algorithm to find the \hyperref[note:Longest k-Sum Subarray Solution]{\it longest 0-sum subarray}
+	after substituting 0's by -1's.
+%	we use an \emph{index map} \incode{B} associating a specific \emph{prefix} balance of 1's and 0's to the earliest index \incode{i}
+%	it was achieved. If the prefix balance between two indices \incode{i, j} is identical, \incode{A[i..j]} must be balanced.
+	\begin{largecode}
+ B = {0: -1}
+ balance = longest = 0
+ for (i from 0 to n-1)
+ 	balance += 1 if A[i] == 1 else -1
+	if (balance in B)
+		longest = max(longest, i - B[balance])
+	else B[balance] = i
+	\end{largecode}
+	\begin{remark} Note the use of an index map and prefix sums. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Prefix Sum, Balance, Index Map}	
+\end{note}
+
+\begin{note}{Inorder Successors Sum}
+	Given the \incode{root} of a binary tree, add to each \incode{node} the sum of all its in-order successors.
+	\begin{largecode}
+ input: inorder = [5, 7, 2, 9, 10, 3]  // given as tree
+ solution: [36, 31, 24, 22, 13, 3]
+	\end{largecode}
+	\bf Solutions \hyperref[note:Recursive Inorder Successor Sum]{\solutionref} \hyperref[note:Iterative Inorder Successor Sum]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Recursive Inorder Successor Sum}
+	The \hyperref[note:Inorder Successors Sum]{\it in-order successor sum} problem can be solved \emph{recursively}
+	using an accumulator which each node increases by its own value.
+	\begin{largecode}
+ int visit(node, acc):  // acc = sum of upper successors
+ 	if (node == NULL) return acc
+	acc = visit(node->right, acc)
+	node->value += acc
+	return visit(node->left, node->value)
+	\end{largecode}
+	\begin{remark} \incode{acc} acts as a global variable. Use a pointer in \incode{C++}.\end{remark}
+	\begin{remark} See the \hyperref[note:Iterative Inorder Successor Sum]{\it iterative} solution.\end{remark}\vspace{-5pt}
+	\tags{Tree, Traversal, Recursive, Solution}
+\end{note}
+
+\begin{note}{Iterative Inorder Successor Sum}
+	The \hyperref[note:Inorder Successors Sum]{\it in-order successor sum} problem can be solved \emph{iteratively}
+	using a stack to traverse the tree in-reverse-order and an accumulator which each node increases by its own value.
+	\begin{largecode}
+ digg(node, stack):
+ 	while (node) {stack.push(node); node = node->right}
+
+ solve(root):
+ 	acc = 0; stack = []; digg(root, stack)
+	while (stack)
+		node = stack.pop()
+		node->value = acc = acc + node->value
+		digg(node->left, stack)
+	\end{largecode}
+	\begin{remark} See the \hyperref[note:Recursive Inorder Successor Sum]{\it recursive} solution.\end{remark}\vspace{-5pt}
+	\tags{Tree, Traversal, Recursive, Solution}
+\end{note}
+
+\begin{note}{Longest Valid Parentheses}
+	Given a string \incode{S} containing characters \incode{(} and \incode{)}, determine the longest
+	valid well-formed parenthesis substring.
+	
+	\begin{largecode}
+ input: S = "()(()()(()"
+ solution:     "()()"
+	\end{largecode}
+	\bf Solution \hyperref[note:Longest Valid Parentheses Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Longest Valid Parentheses Solution}
+	The \hyperref[note:Longest Valid Parentheses]{\it longest valid parentheses} problem can be solved using
+	an advanced \hyperref[note:Sliding Window Method]{\it sliding window} method, using a stack
+	containing the latest index of a potentially problematic character.
+	% Any closing parenthesis \incode{)} encountered results in the removal of the top of the stack.
+	
+	\begin{largecode}
+ stack = [-1]  // sentinel
+ solution = -1
+ for (i from 0 to n-1)
+ 	if (s[i] == "(") stack.push(i)
+	else
+		stack.pop()   // one less problem
+		if (stack.empty()) stack.push(i) // problem!
+		else solution = max(solution, i - stack.top())
+	\end{largecode}
+	\tags{Solution, Sliding Window, Substring, Parentheses}
+\end{note}
+
+\begin{note}{k-Sum Combinations}
+	Given a set of integers \incode{S} and an integer \incode{k},
+	find all distinct combinations from integers in \incode{S} whose sum is equal to \incode{k}.
+	\begin{remark} A combination may contain duplicates. \end{remark}
+	\begin{largecode}
+ input: S = [2, 3, 6, 7], k = 7
+ solution : [[7], [2, 2, 3]]
+	\end{largecode}
+	\bf Solution \hyperref[note:k-Sum Combinations Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{k-Sum Combinations Solution}
+	The \hyperref[note:k-Sum Combinations]{\it k-sum combinations} problem can be solved recursively
+	using the helper function \incode{solve}.
+	Duplicates can be avoided by progressively restricting integers used from \incode{S}.
+	
+	\begin{largecode}
+ solution = [], current = []
+ solve(k, j)
+ 	if (k == 0) { solution.push_copy(current); return }
+	for (i from j to n-1 if S[i] <= k)
+		current.push_back(S[i])
+		solve(k - S[i], i)   // avoid duplicates with j
+		current.pop_back()   // clean-up
+	\end{largecode}
+	\begin{remark} Note how only a single helper buffer \incode{current} is needed. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution}
+\end{note}
+
+\begin{note}{Frog Problem} 
+	You are positioned at the beginning on an array \incode{A} of non-negative integers,
+	representing the maximum distance \incode{A[i]} you can jump forward from each position \incode{i}.
+	Determine the minimum number of jumps to reach the last position.
+	
+	\begin{largecode}
+ input: [2, 3, 1, 1, 4]
+ solution: 2  // 0 -> 1 -> 4
+	\end{largecode}
+	\bf Solutions \hyperref[note:Dynamic Frog Programming]{\solutionref}
+		\hyperref[note:Breadth-First Frog]{\solutionref}
+		\hyperref[note:Improved Breadth-First Frog]{\solutionref}
+		\hyperref[note:Linear Frog Solution]{\solutionref}.
+	\tags{Problem}
+\end{note} 
+
+\begin{note}{Dynamic Frog Programming}
+	The \hyperref[note:Frog Problem]{\it frog problem} can be solved in $O(n^2)$ using dynamic programming
+	with \incode{X[i]} as the minimum jumps required from index \incode{i}.
+
+	\begin{largecode}
+ X[..] = $\infty$, X[n-1] = 0
+ for (i from n - 2 to 0)
+ 	for (j from 1 to A[i] if i + j < n)
+		X[i] = min(X[i], 1 + X[i+j])
+ return X[0]
+	\end{largecode}	%
+	\begin{remark} More efficient solutions are also \hyperref[note:Frog Problem]{\it provided}. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Frog Problem, Dynamic Programming}
+\end{note}
+
+\begin{note}{Breadth-First Frog}
+	The \hyperref[note:Frog Problem]{\it frog problem} can be solved intuitively using a vanilla implementation of
+	\hyperref[note:Breadth-First Search]{\it breadth-first search} over indices as nodes.
+	\begin{largecode}
+ Q = [0], distance = {0: 0}
+ while (true)
+ 	x = Q.dequeue()
+	if (x == n-1) return distance[x]
+	for (j from 1 to A[i] if i + j < n)
+		if (i+j not in distance)
+			distance[i+j] = 1 + distance[i]
+			Q.enqueue(i+j)
+	\end{largecode}
+	\begin{remark}
+		The queue \incode{Q} can be removed for an \hyperref[note:Improved Breadth-First Frog]{\it improved solution},
+		as only increasing integers are enqueued.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Frog Problem, BFS}
+\end{note}
+
+\begin{note}{Improved Breadth-First Frog}
+	The \hyperref[note:Frog Problem]{\it frog problem} can be solved more efficiently using an adapted implementation of
+	\hyperref[note:Breadth-First Search]{\it breadth-first search}, avoiding a stack.
+	\begin{largecode}
+ furthest = 0, distance = {0: 0}
+ for (i = 0; furthest < n - 1; i++)
+ 	if (i + A[i] > furthest)
+		for (j from furthest to i + A[i])
+			distance[i+j] = distance[i] + 1
+		furthest = i + A[i]
+ return distance[n-1]
+	\end{largecode}
+	\begin{remark}
+		The \incode{distance} map can be avoided as well by counting the "waves" or breadth layers,
+		for a \hyperref[note:Linear Frog Solution]{\it linear solution}.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Frog Problem, BFS}
+\end{note}
+
+\begin{note}{Linear Frog Solution}
+	The \hyperref[note:Frog Problem]{\it frog problem} can be solved linearly by improving the
+	\hyperref[note:Improved Breadth-First Frog]{\it breadth-first search solution} to simply count the
+	waves or breadth layers.
+	\begin{largecode}
+ furthest = 0, jumps = 0, cur_wave = 0
+ for (i = 0; i < n - 1; i++)
+ 	furthest = max(furthest, i + A[i])
+	if (i == cur_wave)
+		jumps++
+		cur_wave = furthest
+ return jumps
+	\end{largecode}
+	\begin{remark} This solution can not produce the jump sequence. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Frog Problem, Linear}	
+\end{note}
+
+\end{document}
+
+
+
+

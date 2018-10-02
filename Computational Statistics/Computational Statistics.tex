@@ -1,0 +1,119 @@
+\documentclass{cognito}
+\usepackage{lmodern}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{dsfont}
+
+\begin{document}
+
+% Some options
+\lstset{language=Python}
+\lstset{mathescape=true}
+
+% For links use
+% \hyperref[note:Heuristic Minimax]{\emph{Heuristic Minimax}}
+
+\begin{note}{Computational Statistics}
+	\tags{Daniel Balle 2018}
+\end{note}
+
+% Multiple Linear Regression
+
+\begin{note}{Multiple Linear Regression}
+	In multiple regression we are given data $(Y_i, \mathbf{x_i})$ where we assume the response variable is a linear function of the predictors:
+	$$ Y_i = \bm{\beta}^\intercal\mathbf{x_i} + \epsilon_i $$
+	or $\bm{Y} = X \bm{\beta} + \bm{\epsilon}$ with $\bm{Y} \in \mathds{R}^n$ and $X \in \mathds{R}^{n\times p}$.
+	Errors $\epsilon_i$ are usually assumed \emph{iid} with $\mathds{E}[\epsilon_i] = 0$ and $\text{Var}(\epsilon_i) = \sigma^2$.
+	\begin{mdframed}[linecolor=black!25!white]
+		Our goal is to estimate the unknown parameters $\bm{\beta} \in \mathds{R}^p$.
+	\end{mdframed}
+	\vspace{-10pt}
+	\tags{Supervised Learning, Multiple Linear Regression}
+\end{note}
+
+\begin{note}{Least Squares Estimator}
+	The least squares estimator for a \hyperref[note:Multiple Linear Regression]{\it linear} model $\bm{Y} = X \bm{\beta} + \bm{\epsilon}$ is
+	given by minimizing the least squares error:
+	$$
+		\hat{\bm{\beta}} = \text{arg}\min_{\bm{\beta}} \| \bm{Y} - X\bm{\beta} \|^2
+	$$
+	\begin{remark} This is solved theoretically by $\hat{\bm{\beta}} = (X^\intercal X)^{-1} X^\intercal \bm{Y}$.
+	This estimator is \emph{unbiased}, i.e. $\mathds{E}[\hat{\bm{\beta}}] = \bm{\beta}$ and $\mathds{E}[\hat{\bm{Y}}] =  X\bm{\beta}$.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Supervised Learning, Multiple Linear Regression}
+\end{note}
+
+\begin{note}{Least Squares Residuals}
+	With the \hyperref[note:Least Squares Estimator]{\it least squares} estimator $\hat{\bm{\beta}}$
+	the residuals $r_i = Y_i - \hat{\bm{\beta}}^\intercal \mathbf{x}_i$ give
+	an \emph{unbiased} estimate of the errors $\epsilon_i$, $\mathds{E}[\bm{r}] = \bm{0}$.
+	And
+	$$
+		\hat{\sigma}^2 = (n-p)^{-1} \sum r_i^2
+	$$
+	provides an \emph{unbiased} estimate of the variance, i.e. $\mathds{E}[\hat{\sigma}^2] = \sigma^2$.
+	\tags{Supervised Learning, Multiple Linear Regression, Least Squares Estimator}
+\end{note}
+
+\begin{note}{Least Squares Projection}
+	Geometrically the \hyperref[note:Least Squares Estimator]{\it least squares} method
+	performs an orthogonal projection $\bm{Y} \mapsto \hat{\bm{Y}} = X\hat{\bm{\beta}}$ with projection matrix:
+	$$
+		 \hat{\bm{Y}} = P\bm{Y} \implies P = X (X^\intercal X)^{-1} X^\intercal
+	$$
+	\begin{remark} The residuals can then be expressed as $\mathbf{r} = (I - P)\bm{Y}$.\end{remark}
+	\vspace{-5pt}
+	\tags{Supervised Learning, Multiple Linear Regression, Least Squares Estimator}
+\end{note}
+
+\begin{note}{Linear Regression in R}
+	In \incode{R} a \hyperref[note:Multiple Linear Regression]{\it linear regression} model can be fitted as follows:
+	\begin{code}
+fitted <- lm(formula = LOGRUT ~ ., data = asphalt1)
+	\end{code}
+	\vspace{-5pt}
+	\tags{Supervised Learning, Multiple Linear Regression, Least Squares Estimator}
+\end{note}
+
+\begin{note}{Bias-Variance Tradeoff}
+	The bias-variance decomposition
+	for any \emph{supervised} learning task of $y = f(x) + \epsilon$ is the expected generalization error:
+%	$$
+%		\mathds{E}[(y - \hat{f}(x))^2] = (\underbrace{\mathds{E}[\hat{f}(x) - f(x)]}_{\text{bias}})^2
+%		+ \underbrace{\mathds{E}[\hat{f}(x)^2] - E[\hat{f}(x)]^2}_{\text{Var}(\hat{f}(x))}
+%	$$
+	$$
+		\underbrace{\mathds{E}[(f(x) - \hat{f}(x))^2]}_{\text{MSE}(x)} = (\underbrace{\mathds{E}[\hat{f}(x)] - f(x)}_{\text{Bias}})^2
+		+ \underbrace{\mathds{E}[\hat{f}(x)^2] - E[\hat{f}(x)]^2}_{\text{Var}(\hat{f}(x))}
+	$$
+	\begin{remark} Optimizing this trade-off is called \emph{regularization}, and avoids the problem of \emph{overfitting}.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Supervised Learning}
+\end{note}
+
+% More LS moments?
+% Tests and Confidence Intervals for parameters
+% Model Selection
+% R code?
+
+\begin{note}{Kernel Density Estimation}
+	Given realizations $X_i \in \mathds{R} \sim F$, the nonparametric kernel density estimator $\hat{f}$
+	of the unknown density function $f = F'$ is
+	$$
+		\hat{f}(x) = \frac{1}{nh} \sum K\left(\frac{x - X_i}{h}\right)
+	$$
+	where $K(\cdot)$ is a \emph{kernel} function, usually symmetric around 0, and the tuning parametrer $h$ the \emph{bandwidth}.
+	$$
+		\textstyle K(x) = K(-x) \quad K(x) \geq 0 \quad \int_{-\infty}^\infty K(x) dx = 1
+	$$
+	\vspace{-10pt}
+	\tags{Nonparametric Density Estimation}
+\end{note}
+
+\end{document}
+
+
+
+

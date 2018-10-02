@@ -1,0 +1,874 @@
+\documentclass{cognito}
+\usepackage{lmodern}
+\usepackage{mathtools}
+
+\begin{document}
+
+% Some options
+\lstset{language=Python}
+\lstset{mathescape=true}
+
+% For links use
+% \hyperref[note:Heuristic Minimax]{\emph{Heuristic Minimax}}
+
+\begin{note}{Artificial Intelligence}
+	\tags{Daniel Balle 2018}
+\end{note}
+
+%%%% PART II : Problem-Solving
+
+%%% 3 Searching
+
+\begin{note}{Classical Search}
+	Path search problems are well-defined problems in which the solution is a \emph{path}
+	or action sequence from an initial state to a goal state. All possible
+	sequences form a search tree.
+	\vspace{5pt}
+	
+	All path search algorithms share the same structure, but vary primarily
+	according to how they choose which state to expand next - their \emph{search strategy}.
+	\tags{Search, Path Search}
+\end{note}
+
+%% 3.4 Uninformed search
+
+\begin{note}{Graph Search}
+	Graph search is a general search algorithm
+	similar to  tree search that remembers his past exploration.
+	\begin{code}
+explored = Set(); frontier = {start state}
+while (frontier):
+ 	x = frontier.pop(strategy)
+	if (x is goal state): return solution
+	explored.add(x)
+	for (n in x.successors() if n not in explored):
+		frontier.add(n)  # or update
+return False
+	\end{code}
+	\tags{Search, Path Search, Uninformed Search}
+\end{note}
+
+\begin{note}{Graph Search Implementation}
+	The \hyperref[note:Graph Search]{\emph{graph search}} algorithm above can be extended to allow any 
+	search strategy by using a priority queue as the frontier. Each element in the
+	priority should be a sequence of
+	\begin{itemize}
+		\item the node $n$ itself
+		\item the path-cost $g(n)$
+		\item the path that explored this node
+	\end{itemize}
+	\begin{remark} Our queue retrieves elements with lowest weights first.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Search, Path Search, Uninformed Search}
+\end{note}
+
+\begin{note}{Breadth-First Search}
+	\begin{mdframed}[linecolor=black!25!white]
+		search strategy: time
+	\end{mdframed}
+	BFS is a \hyperref[note:Graph Search]{\emph{graph search}} algorithm using a FIFO queue for the frontier, thus the
+	shallowest node is chosen for expansion at every step.
+	The goal state test can also be applied during discovery rather than expansion.
+	
+	\begin{remark} BFS is only optimal when the path cost is a nondecreasing function
+		of the depth of the node. It is complete under finite branching factor $b$.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Search, Path Search, Uninformed Search}
+\end{note}
+
+\begin{note}{Uniform-Cost Search}
+	\begin{mdframed}[linecolor=black!25!white]
+		search strategy: path cost $g(n)$
+	\end{mdframed}
+	UCS is a generic \hyperref[note:Graph Search]{\emph{graph search}} algorithm which expands the node $n$ with lowest path cost $g(n)$ first.
+	\begin{remark} It is optimal for any path cost. \end{remark}
+	\begin{remark} See \emph{Dijkstra's} algorithm from \textbf{Algorithms} \noteref notes. \end{remark}
+	\vspace{-5pt}
+	\tags{Search, Path Search, Uninformed Search}
+\end{note}
+
+\begin{note}{Depth-First Search}
+	\begin{mdframed}[linecolor=black!25!white]
+		search strategy: -time
+	\end{mdframed}
+	DFS is a \hyperref[note:Graph Search]{\emph{graph search}} algorithm using a stack,
+	it thus always expands the deepest node in the frontier. 
+	\begin{remark} DFS is not optimal. Its tree search isn't even complete.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Search, Path Search, Uninformed Search}
+\end{note}
+
+\begin{note}{Iterative Deepening DFS}
+	Iterative Deepening search performs a \emph{depth-limited} \hyperref[note:Depth-First Search]{\it depth-first search}
+	by gradually increasing the limit.
+	\begin{remark}
+		Optimality and completeness as BFS. 
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Search, Path Search, Uninformed Search}
+\end{note}
+
+%% 3.5 Informed Search
+\begin{note}{Best-First Search}
+	\begin{mdframed}[linecolor=black!25!white]
+		search strategy: $f(n)$
+	\end{mdframed}
+	Best-First Search is a general \emph{informed} \hyperref[note:Graph Search]{\emph{graph search}} algorithm using
+	an evaluation function $f(n)$ as its search strategy, usually involving a
+	\emph{heuristic} function:
+	$$
+		h(n) = \text{estimated cost of optimal path from $n$ to goal}
+	$$
+	\vspace{-10pt}
+	\tags{Search, Path Search, Informed Search}
+\end{note}
+
+
+\begin{note}{Greedy Best-First Search}
+	\begin{mdframed}[linecolor=black!25!white]
+		search strategy: $f(n) = h(n)$
+	\end{mdframed}
+	Greedy Search is an \hyperref[note:Best-First Search]{\it informed search} algorithm that expands nodes that are estimated
+	to be the closest to the goal using some heuristic function $h(n)$.
+	\begin{remark} It is neither optimal nor complete. \end{remark}
+	\vspace{-5pt}
+	\tags{Search, Path Search, Informed Search}
+\end{note}
+
+\begin{note}{A* Search}
+	\begin{mdframed}[linecolor=black!25!white]
+		search strategy: $f(n) = g(n) + h(n)$
+	\end{mdframed}
+	A* Search is an \hyperref[note:Best-First Search]{\it informed search} algorithm using
+	an estimated cost of the cheapest solution through $n$ as its
+	evaluation function.
+	\begin{remark} It is both complete and optimal when $h$ is \hyperref[note:Heuristic Admissibility]{\it admissible} for tree search,
+		or \hyperref[note:Heuristic Consistency]{\it consistent} for graph search.
+		A* is also optimally efficient in terms of nodes expanded.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Search, Path Search, Informed Search}
+\end{note}
+
+\begin{note}{Iterative Deepening A*}
+	IDA* is an application of \hyperref[note:Iterative Deepening DFS]{\it iterative deepening} to \hyperref[note:A* Search]{\it A* search}
+	using a cutoff value
+	for the evaluation function $f(n)$. At each iterations the new cutoff
+	value is the lowest $f(n)$ that previously exceeded the cutoff.
+	
+	\tags{Search, Path Search, Informed Search}
+\end{note}
+
+% Recursive Best-First Search
+% ? A* optimality proof ?
+
+\begin{note}{Heuristic Admissibility} 
+	A heuristic $h$ is admissible if it never overestimates the
+	true optimal path from $n$ to the goal $h^*(n)$.
+	$$ h(n) \leq h^*(n) \quad \forall n \in V$$
+	\vspace{-10pt}
+	\tags{Search, Path Search, Informed Search, Heuristics}
+\end{note}
+
+\begin{note}{Heuristic Consistency} 
+	A heuristic $h$ is consistent if for any successors $n'$ of $n$ reached through action $a$, it holds that: 
+	$$ h(n) \leq c(n, a, n') + h(n') \quad \forall (n, n') \in E$$
+	\begin{remark} Consistency implies \hyperref[note:Heuristic Admissibility]{\it admissibility}. \end{remark}
+	\vspace{-5pt}
+	\tags{Search, Path Search, Informed Search, Heuristics}
+\end{note}
+
+\begin{answer}{Path Search Todo}
+	\begin{itemize}
+		\item Runtime and Memory properties
+		\item Optimality proof of A*
+		\item Recursive Best-First Search, MA*, SMA*
+	\end{itemize}
+	\tags{Search, Path Search}
+\end{answer}
+
+
+%%% 4 Optimization and Local Search
+\begin{note}{Optimization and Local Search}
+	Local search algorithms operate using a single current node and solve
+	optimization problems whose solution is a \emph{state} $s^* \in S$ according
+	to some objective function $f(s)$.
+
+	\tags{Search, Local Search \& Optimization}
+\end{note}
+
+\begin{note}{Hill-Climbing Search}
+	\begin{mdframed}[linecolor=black!25!white]
+		$$
+			x^{(t+1)} \leftarrow x^{(t)} + \eta \nabla f(x^{(t)})
+			\quad\quad \eta > 0
+		$$
+	\end{mdframed}
+	Hill-climbing search is a greedy \hyperref[note:Optimization and Local Search]{\it local search} algorithm which continually moves in the
+	direction of increasing value. Variations include:
+	\begin{description}
+		\item[Stochastic:] choose randomly among all uphill moves.
+		\item[First-choice:] randomly generate successors until a better state than the current one is found.
+		\item[Random-restart:] Multiple tries with random initial states.
+	\end{description}
+	\vspace{-5pt}
+	\tags{Search, Local Search \& Optimization}
+\end{note}
+
+\begin{note}{Simulated Annealing}
+	This \hyperref[note:Optimization and Local Search]{\it local search} algorithm picks a random move $n$:
+	\begin{mdframed}[linecolor=black!25!white]
+	\begin{itemize}
+		\item if the move improves the state, it accepts
+		\item otherwise it accepts with probability $p = e^{\Delta E / T}$
+	\end{itemize}
+	\end{mdframed}
+	with $\Delta E$ the amount by which the state is worsened,
+	and $T$ the temperature at time $t$.
+	\tags{Search, Local Search \& Optimization}
+\end{note}
+
+\begin{answer}{Local Search Todo}
+	\begin{itemize}
+		\item Local Beam Search
+		\item Genetic Algorithms
+		\item Continuous local search
+		\item Constraint Search Problem, Integer Programming
+		\item AND-OR Search
+		\item Online vs Offline Search
+		\item All the rest ...
+	\end{itemize}
+	\tags{Search, Local Search \& Optimization}
+\end{answer}
+
+%%% Adverserial Search
+
+\begin{note}{Adversarial Search}
+	Games are adversarial search problems in a competitive multi-agent environment
+	whose solution is a \emph{strategy} $f : S \to A$.
+	%The solution to a game is a \emph{strategy} $f : S \to A$.
+	\vspace{5pt}
+	
+	Similar to search, the sequences of actions from the initial game state generate a \emph{game tree}.
+	A utility functions defines the final value of a terminal state for each player.
+	\begin{remark} Games can also be seen as \hyperref[note:Stochastic Decision Problems]{\it decision problems}.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Search, Adversarial Search}
+\end{note}
+
+% Reflex agent
+
+\begin{note}{Minimax Decision}
+	The minimax decision in a given game state $s$ is choosing the optimal action $a$,
+	assuming opponents play optimally. We maximize the worst-case outcome, based
+	on the \emph{minimax value}:
+	$$
+		mv(s) = \begin{cases*}
+			\text{utility}(s) & if $s$ is terminal\\
+			\max_a \, mv(s + a) & if player is \textit{Max}\\
+			\min_a \, mv(s + a) & if player is \textit{Min}
+		\end{cases*}
+	$$
+	\vspace{-5pt}
+	\tags{Search, Adversarial Search, Minimax}
+\end{note}
+
+\begin{note}{Minimax Algorithm}
+	Given a current state $s$, the minimax algorithm performs the \hyperref[note:Minimax Decision]{\emph{minimax decision}}.
+	This results in a complete \hyperref[note:Depth-First Search]{\emph{depth-first}} search exploration of the game tree.
+%	\begin{code}
+%for action in game.getActions(state):
+%	value = minimaxValue(game.getSuccessor(state, action))
+%	if (value > best.value): best = Decision(action, value)
+%return action
+%	\end{code}
+		\begin{code}
+decisions = { 
+	action : minimaxValue(game.getSuccessor(state, action))
+	for action in game.getActions(state)
+}
+return max(decisions, key=decisions.get)
+	\end{code}
+	\begin{remark}
+		In practice we use a \emph{ply} limited search: \hyperref[note:Heuristic Minimax]{\it heuristic minimax}.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Search, Adversarial Search, Minimax}
+\end{note}
+
+\begin{note}{Alpha Beta Pruning}
+	$\alpha$-$\beta$ pruning is an optimization technique for \hyperref[note:Minimax Algorithm]{\it minimax search}
+	which prunes away branches in the minimax tree that won't change the final decision, using additional variables:
+	\begin{itemize}
+		\item $\alpha =$ value of best decision by $Max$ on path to root
+		\item $\beta =$ value of best decision by $Min$ on path to root
+	\end{itemize}
+	\tags{Search, Adversarial Search, Minimax}
+\end{note}
+
+\begin{note}{Alpha Beta Implementation}
+	The \hyperref[note:Alpha Beta Pruning]{\it $\alpha$-$\beta$ pruning} algorithm \incode{minimaxValue(s, $\alpha$, $\beta$)} for player \textit{Min} can be implemented as follows.
+	\begin{code}
+for next in game.getSuccessors(state):
+	value = min(value, minimaxValue(next, $\alpha$, $\beta$))
+	if (value < $\alpha$) : return value
+	$\beta$ = min($\beta$, value)
+return value
+	\end{code}
+	Because $Max$ can choose an action yielding $\alpha$, this subtree won't be considered for his
+	final decision if we yield a value $< \alpha$.
+	
+	\tags{Search, Adversarial Search, Minimax}
+\end{note}
+
+\begin{note}{Heuristic Minimax}
+	H-minimax is a depth or ply limited \hyperref[note:Minimax Algorithm]{\it minimax search} using a heuristic evaluation function
+	for non-terminal states.
+	$$
+		hm(s, d) = \begin{cases*}
+			\text{eval}(s) & if cutoff$(s, d)$\\
+			\max_a  \, hm(s + a, d + 1) & if player is \textit{Max}\\
+			\min_a \, hm(s + a, d + 1) & if player is \textit{Min}
+		\end{cases*}
+	$$
+	\begin{remark} This is used in practice for imperfect real-time decisions.
+		Another approach is using \hyperref[note:Iterative Deepening DFS]{\it iterative deepening} until time runs out.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Search, Adversarial Search, Minimax}
+\end{note}
+
+% Quiescence search
+% Horizon Effect and singular extension
+% The rest of 5.4 and onwards
+
+\begin{note}{Expecti-Minimax Value}
+	Expecti-minimax is an extension of \hyperref[note:Minimax Decision]{\it minimax} to stochastic games in which
+	we use the expected value for states played by a \emph{chance} player.
+	$$
+		em(s) = \begin{cases*}
+			\sum_a \, p(a) em(s + a) & if player is \textit{Chance}\\
+			mv(s) & otherwise
+		\end{cases*}
+	$$
+	\vspace{-5pt}
+	\tags{Search, Adversarial Search, Minimax}
+\end{note}
+
+\begin{note}{Bayesian Networks}
+	A Bayesian network is a locally structured representation of a \emph{joint probability} distribution
+	as a directed acyclic graph where:\begin{itemize}
+		\item each node $X$ is a random variable
+		\item annotated with \emph{conditional} probability distribution given its incoming nodes or parents $\mathbf{P}(X|\text{Parents}(X))$
+	\end{itemize}
+	Each node $X$ is conditionally independent of its \emph{non-descendants} given his parents, and all other nodes
+	given his \hyperref[note:Markov Blanket]{\emph{Markov Blanket}}.
+	
+	\tags{Uncertainty, Probabilistic Reasoning}
+\end{note}
+
+\begin{note}{Markov Blanket}
+	In a \hyperref[note:Bayesian Networks]{\emph{Bayesian network}}, the Markov blanket $\partial X$ of a node $X$ is the set including his \emph{parents}, \emph{children}, and \emph{children's parents}.
+	$$
+		X \perp \!\!\!\! \perp B \mid \partial X \quad \text{or} \quad P(X \mid \partial X, B) = P(X \mid \partial X)
+	$$
+	\vspace{-10pt}
+	\tags{Uncertainty, Probabilistic Reasoning, Bayesian Networks}
+\end{note}
+
+\begin{note}{Chain Rule}
+	The chain rule can be used to compute any \emph{joint} distribution given only conditional probabilities,
+	e.g. by a \hyperref[note:Bayesian Networks]{\it Bayesian network}:
+	$$
+		P( X_1,..., X_n) = \prod_{i=1}^n P(X_i \mid X_{i-1}, ..., X_1)
+	$$
+	\vspace{-10pt}
+	\tags{Uncertainty, Probabilistic Reasoning, Bayesian Networks}
+\end{note}
+
+\begin{note}{D-Separation}
+	In a \hyperref[note:Bayesian Networks]{\it Bayesian network},
+	a path $p$ \emph{d-separates} $X$ and $Y$ by set $Z$ containing variable $M$ if \emph{any} of these conditions hold:
+	\begin{itemize}
+		\item $p$ contains a directed chain $X \to ... \to M \to ... \to Y$
+		\item $p$ contains a fork $X \to ... \to M \leftarrow ... \leftarrow Y$
+		\item $p$ contains an inverted fork $X \leftarrow ... \leftarrow N \to ... \to Y$, where neither $N$ nor any of its descendants $\in Z$
+	\end{itemize}
+	If \emph{all} paths $p$ from $X$ to $Y$ are d-separated, then $X \perp \!\!\!\! \perp Y \mid Z$.
+	\tags{Uncertainty, Probabilistic Reasoning, Bayesian Networks}
+\end{note}
+
+% Continuous Bayesian Networks?
+
+\begin{note}{Probabilistic Inference}
+	Probabilistic inference computes the \emph{posterior} distribution of a set of \emph{query} variables
+	given an assignment of \emph{evidence} variables.
+	$$
+		\mathbf{P}(X\mid \mathbf{e})
+	$$
+	\begin{remark} We usually denote by $\mathbf{Y}$ the \emph{hidden} variables. \end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Probabilistic Reasoning, Inference}
+\end{note}
+
+\begin{note}{Inference by Enumeration}
+	IE is an exact \hyperref[note:Probabilistic Inference]{\it inference} technique which
+	selects the terms consistent with the evidence $\mathbf{e}$ from the \emph{joint} distribution to sum out the hidden variables before normalizing.
+	$$
+		\textstyle \mathbf{P}(X\mid \mathbf{e}) = \alpha \mathbf{P}(X, \mathbf{e}) = \alpha \sum_\mathbf{y} \mathbf{P}(X, \mathbf{e}, \mathbf{y}) 
+	$$
+	\begin{remark} Given a \hyperref[note:Bayesian Networks]{\emph{Bayesian network}}, $\mathbf{P}(X, \mathbf{e}, \mathbf{y})$
+	can be computed using the \hyperref[note:Chain Rule]{\it chain rule} on the conditional probabilities.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Probabilistic Reasoning, Inference}
+\end{note}
+
+\begin{note}{Variable Elimination}
+	VE is a dynamic programming algorithm for exact \hyperref[note:Probabilistic Inference]{\it inference}
+	summing out the hidden variables $\mathbf{y}$ right-to-left
+	and storing intermediate \emph{factors} $\mathbf{f}_i$. 
+	$$
+	 \textstyle \mathbf{P}(X\mid \mathbf{e}) = \alpha \sum_{y_1} \mathbf{f}_2(y_1, X, \mathbf{e}_2) \times \sum_{y_2} \mathbf{f}_1(y_2, X, \mathbf{e}_1)
+	$$
+	\begin{remark} $\times$ is point-wise product operator as $\mathbf{f}_i$ are matrices.\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Probabilistic Reasoning, Inference}
+\end{note}
+
+\begin{note}{Direct Sampling}
+	Direct or prior sampling for \hyperref[note:Bayesian Networks]{\it Bayesian networks} is a randomized sampling algorithm which samples
+	each variable in \emph{topological} order, conditioned on the sampled values of its parents.
+	\begin{code}
+for $X_i$ in Topologic[$X_1$, ..., $X_n$] do
+	$\mathbf{x}[i]$ $\leftarrow$ random sample from $\mathbf{P}(X_i | $parents$(X_i) )$
+	\end{code}
+	The \emph{consistent} estimate of the \emph{joint} probability is then given by
+	$$
+		\textstyle S_{PS}(\mathbf{x}) = N_{PS}(\mathbf{x}) \cdot N^{-1} \xrightarrow{N \to \infty } P(\mathbf{x})
+	$$
+	%\begin{remark} the topological order is given by the Bayesian network.\end{remark}
+	\begin{remark} This is an instance of a \emph{Monte Carlo} algorithm.\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Probabilistic Reasoning, Sampling}
+\end{note}
+
+\begin{note}{Rejection Sampling}
+	Rejection Sampling performs \hyperref[note:Direct Sampling]{\emph{prior sampling}}
+	and then rejects all samples that do not match the evidence $\mathbf{e}$.
+	$$
+		\textstyle \mathbf{\hat{P}}(X | \mathbf{e}) = \mathbf{N}_{RS}(X, \mathbf{e}) \cdot N_{PS}(\mathbf{e})^{-1}
+	$$
+	\begin{remark} Rejection sampling produces a consistent estimate.\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Probabilistic Reasoning, Sampling}
+\end{note}
+
+\begin{note}{Likelihood Weighting}
+	Likelihood weighting is an extension to  \hyperref[note:Direct Sampling]{\it prior sampling} which
+	samples only the non-evidence variables, and weighs each sample according to
+	its \emph{likelihood} given the evidence.
+	\begin{code}
+for $X_i$ in Topologic[$X_1$, ..., $X_n$] do
+	if $X_i$ is evidence in $\mathbf{e}$ with value $x_i$ do
+		$\mathbf{x}[i]$ $\leftarrow$ $x_i$; $w \leftarrow w \cdot P(X_i = x_i \mid $parents$(X_i))$  # initially 1
+	else $\mathbf{x}[i]$ $\leftarrow$ random sample from $\mathbf{P}(X_i | $parents$(X_i) )$
+	\end{code}
+	$$
+		\textstyle \hat{P}(x | \mathbf{e}) = \alpha \sum_\mathbf{y} N(x, \mathbf{y}, \mathbf{e}) \cdot w(x, \mathbf{y}, \mathbf{e})
+	$$
+	\begin{remark} This is an instance of importance sampling.\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Probabilistic Reasoning, Sampling}
+\end{note}
+
+\begin{note}{Gibbs Sampling}
+	From an arbitrary sample $s_1$ with correct evidence $\mathbf{e}$, generate the next sample $s_2$ by sampling
+	one of the non-evidence variables $X_i$
+	conditioned on the values of its \hyperref[note:Markov Blanket]{\emph{Markov Blanket}} $\partial X_i$ in $s_1$.
+	$$ x_i \sim \mathbf{P}(X_i \mid \partial X_i \in s_1)$$
+	\begin{remark} This is a \emph{Markov Chain Monte Carlo} algorithm.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Probabilistic Reasoning, Sampling}
+\end{note}
+
+% D-Separation
+
+% RELATIONAL AND FIRST-ORDER PROBABILITY MODELS
+
+%  value-of-perfect-information computations ?
+
+
+\begin{note}{Stochastic Decision Problems}
+	A solution to a sequential decision problem in a stochastic environment
+	%where actions are non-deterministic
+	is a \emph{policy} mapping
+	every state $s$ to an action $a$:
+	$$
+		\pi : S \to A
+	$$
+	\begin{remark} Partially observable environments require a mapping from belief states $b$ instead $\pi : \Delta(S) \to A$.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search}
+\end{note}
+
+\begin{note}{Policy and Utility}
+	We denote by $V^*(s)$ or $U^*(s)$ the expected sum of future rewards, or \emph{utility}, when acting optimally starting from state $s$.
+	The utility of acting under policy $\pi$ is denoted as $V^\pi(s)$.
+	An \emph{optimal policy} $\pi^*$ is one that yields the highest expected utility:
+	$$
+		\pi^*_s = \text{arg}\max_\pi V^\pi(s)
+	$$
+	\vspace{-10pt}
+	\tags{Uncertainty, Policy Search}
+\end{note}
+
+\begin{note}{Planning vs. Learning}
+	Algorithms to solve \hyperref[note:Stochastic Decision Problems]{\it decision problems} can be categorized based on the environment:
+	\begin{description}
+		\item[Fully specified] $\to$ we use \emph{offline} algorithms to \emph{plan} $\pi$
+			% This is typically achieved using a Markov Decision Procress.
+		\item[Unknown] $\to$ we use \emph{online} algorithms to \emph{learn} $\pi$
+	\end{description}
+	\begin{remark} Learning is sometimes referred to as \emph{online} planning.\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search}
+\end{note}
+
+\begin{note}{Markov Decision Process}
+	An MDP is a mathematical framework for non-deterministic decision \hyperref[note:Planning vs. Learning]{\it planning} problems.
+	It consists of:
+	\begin{itemize}
+		\item a set of states $S$, a start state $s_0$ and terminal states $\subseteq S$
+		\item a set of actions $A(s)$ for each state $s \in S$
+		\item a \emph{Markovian} (memoryless) transition model $P(s' | s, a)$
+		\item a reward function $R(s,a,s')$ and a discount factor $\gamma$
+	\end{itemize}
+	\tags{Uncertainty, Policy Search, Offline Planning}
+\end{note}
+
+\begin{note}{Finite Horizons and Discounting}
+	To prevent policies $\pi$ yielding infinite utility we introduced finite horizons or discounting.
+	The ladder results in \emph{discounted rewards} $\gamma^t R(s, a, s')$ for actions taken at time $t$.
+	We then obtain a discounted utility function:
+	$$
+		U(\mathbf{h}) = R(s_0) + \gamma R(s_1) + \gamma^2 R(s_2) + ... < \frac{R_{max}}{1 - \gamma}
+	$$
+	\begin{remark}
+		Finite horizon decision problems yield \emph{non-stationary} policies, i.e.
+		policies depending on time $\pi : S \times T \to A$.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Offline Planning}
+\end{note}
+
+\begin{note}{Bellman Equation and Optimality}
+	An optimal policy $\pi^*$ is one that satisfies the \emph{Bellman Equation}:
+	\begin{itemize}
+		\item $V^*(s) = \max_a  \sum_{s' \in S} P(s' | s, a) \left\{ R(s,a,s') + \gamma V^*(s') \right\}$
+		\item $Q^*(s, a) = \sum_{s' \in S} P(s' | s, a) \left\{ R(s,a,s') + \gamma V^*(s') \right\}$
+		\item $\pi^*(s) = \text{arg}\max_a Q^*(s, a)$
+	\end{itemize}
+	\begin{remark} The final line is called \emph{Policy Extraction}. \end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Offline Planning, MDP}
+\end{note}
+
+\begin{note}{Value Iteration}
+	Value Iteration is an DP algorithm for computing the values $V^*(s)$ using the Bellman update
+	until convergence:
+	$$
+		V^{k+1}(s) = \max_a  \sum_{s' \in S} P(s' | s, a) \left\{ R(s,a,s') + \gamma V^k(s') \right\}
+	$$
+	\begin{remark} Equivalent to a depth-$k$ expectimax search on the Markov Decision Process search tree.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Offline Planning, MDP}
+\end{note}
+
+% Convergence of VI ?
+
+\begin{note}{Policy Iteration}
+	Policy Iteration is an algorithm for computing the optimal policy $\pi^*$ directly using an initial policy $\pi_0$ and alternating:
+	\begin{enumerate}
+		\item {\bf $\pi$ evaluation}: compute $V^{\pi_i}(s)$ for each state.
+		\item {\bf $\pi$ improvement}: $\pi_{i+1}(s) = \text{arg}\max_a Q^{\pi_i}(s, a)$
+	\end{enumerate}
+	\begin{remark} $\pi$ evaluation can be done using a simplified value iteration algorithm
+		or solving $|S|$ linear equations using algebra.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Offline Planning, MDP}
+\end{note}
+
+\begin{note}{Simplified Value Iteration}
+	This algorithm uses a simplified Bellman update to evaluate a given policy $\pi$ for Policy Iteration.
+	$$
+		V^{\pi}_{k+1}(s) =  \sum_{s' \in S} P(s' | s, \pi(s)) \left\{ R(s,\pi(s),s') + \gamma V^{\pi}_k(s') \right\}
+	$$
+	\vspace{-10pt}
+	\tags{Uncertainty, Policy Search, Offline Planning, MDP, Policy Iteration}
+\end{note}
+
+% Async Policy Improvement
+
+% Partially Observable MDP
+
+% Bayesian Decision Network
+
+% Game Theory
+\begin{note}{Game Theory}
+	Uncertainty in an environment can be caused by non-deterministic actions or by
+	the presence of multiple agents in the environment.
+	In the contest of games we talk about \emph{strategies} rather than policies.
+	\vspace{5pt}
+
+	See the \textbf{Game Theory} \noteref notes for more details on decision problems in multi-agent environments.
+	\tags{Uncertainty, Strategy Search}
+\end{note}
+
+\begin{note}{Reinforcement Learning}
+	RL is an \emph{online} planning process for unknown stochastic decision problems which \emph{explores} to collect \emph{reinforcements}.
+	\begin{description}
+		\item[Passive] $\to$ learn the state values $V^{\pi_0}(s)$ of a fixed policy $\pi_0$
+		\item[Active] $\to$ learn and \emph{use} an estimate of the optimal policy $\pi^*$
+	\end{description}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning}
+\end{note}
+
+\begin{note}{Machine and Statistical Learning}
+	See the \textbf{Computational Statistics} \noteref and \textbf{Data Mining} \noteref notes
+	for more details on \emph{supervised} and \emph{unsupervised} learning.
+	
+	\tags{Uncertainty, Policy Search, Reinforcement Learning}
+\end{note}
+
+%% Relationship with supervised learning!
+
+\begin{note}{Exploration vs Exploitation}
+	Active RL algorithms use an \emph{exploration} policy $\pi_e$ which captures a trade-off between:
+	\begin{description}
+		\item[Exploration] $\to$ improve the estimate of the true model
+		\item[Exploitation] $\to$ maximize rewards according to $\hat{\pi}^*$
+	\end{description}
+	\begin{remark}
+		Passive learning for $\pi_0$ is equivalent to active learning with constant exploration policy $\pi_e = \pi_0$.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning}
+\end{note}
+
+\begin{note}{Direct Utility Learning}
+	\begin{mdframed}[linecolor=black!25!white]
+		\emph{Passive \& model-free} RL
+	\end{mdframed}
+	\begin{itemize}
+		\item Follow a fixed policy $\pi_0$ to collect pairs $(s, V^{\pi_0}_k(s))$ where $V^{\pi_0}_k(s)$ is the sum of rewards
+		received in episode $k$ from state $s$.
+		\item Estimate $V^{\pi_0}(s)$ by averaging all $V^{\pi_0}_k(s)$ containing $s$.
+	\end{itemize}
+	\begin{remark} Similar to supervised learning for $\{ s \to  V^{\pi_0}_k(s) \}$ data.\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning}
+\end{note}
+
+\begin{note}{Adaptive Dynamic Programming}
+	\begin{mdframed}[linecolor=black!25!white]
+		\emph{Active \& model-based} RL
+	\end{mdframed}
+	\begin{itemize}
+	\item collect samples $(s, \pi_e(s), s', R)$ through $\pi_e$
+	\item estimate the reward $\hat{R}$ and transition function $\hat{T}$
+	\item use \emph{offline} planning to compute $\hat{V}^{\pi_0}(s)$ or $\hat{\pi}^*$
+	\end{itemize}
+	\begin{remark} Similar to supervised learning for $\{ (s, a) \to (s',R) \}$ data.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning}
+\end{note}
+
+% Bayesian RL
+%\begin{note}{Bayesian RL}
+%	\begin{mdframed}[linecolor=black!25!white]
+%		\emph{Active \& model-based}
+%	\end{mdframed}
+%	\begin{itemize}
+%		\item Define prior probabilities $P(h)$ that model $h$ is correct
+%		\item Given evidence $\mathbf{e}$ from $\pi_e$ compute posterior $P(h|\mathbf{e})$
+%		\item Once learning is complete, compute the expected utility $V_h^{\pi}$ of $\pi$ in model $h$ averaged over all starting states.
+%	\end{itemize}
+%		$$
+%			\pi^* = \text{arg}\max_\pi \sum_h P(h | \mathbf{e}) V_h^{\pi}
+%		$$
+%	\vspace{-10pt}
+%	\tags{Uncertainty, Policy Search, Reinforcement Learning}
+%\end{note}
+%
+%\begin{note}{Robust Control Theory}
+%	\begin{mdframed}[linecolor=black!25!white]
+%		\emph{Active \& model-based}
+%	\end{mdframed}
+%		\begin{itemize}
+%		\item Define $\mathcal{H}$ as the set of possible models
+%		\item Once learning is complete, compute the expected utility $V_h^{\pi}$ of $\pi$ in model $h$ averaged over all starting states.
+%	\end{itemize}
+%		$$
+%			\pi^* = \text{arg}\max_\pi \min_h  V_h^{\pi}
+%		$$
+%	\vspace{-10pt}
+%	\tags{Uncertainty, Policy Search, Reinforcement Learning, Active}
+%\end{note}
+
+\begin{note}{Temporal Difference Learning}
+	\begin{mdframed}[linecolor=black!25!white]
+		\emph{Passive \& model-free} RL
+	\end{mdframed}
+	Under fixed $\pi$, update $\hat{V}^\pi(s)$ for every sample $R(s, \pi(s), s')$ using
+	an exponential running average with \emph{learning rate} $\alpha$:
+	\begin{align*}
+		&\Omega \triangleq R(s, \pi(s), s') + \gamma \hat{V}^\pi(s')\\
+		&\hat{V}^\pi(s) \leftarrow (1 - \alpha) \hat{V}^\pi(s) + \alpha \Omega = \hat{V}^\pi(s) + \alpha( \Omega - \hat{V}^\pi(s) )
+	\end{align*}
+	\vspace{-10pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning}
+\end{note}
+
+% Priority Sweeping
+
+\begin{note}{Q-Learning}
+	\begin{mdframed}[linecolor=black!25!white]
+		\emph{Active \& model-free} RL
+	\end{mdframed}
+	Learn the q-state values $\hat{Q}(s, \pi_e(s))$ for every sample $R(s, \pi_e(s), s')$ using
+	a running average with \emph{learning rate} $\alpha$:
+	\begin{align*}
+		&\textstyle \Omega \triangleq R(s, a, s') + \gamma \max_{a'} \hat{Q}(s',a')\\
+		&\textstyle \hat{Q}(s,a) \leftarrow (1 - \alpha) \hat{Q}(s,a) + \alpha \Omega = \hat{Q}(s,a) + \alpha ( \Omega - \hat{Q}(s,a))
+	\end{align*}
+	\begin{remark} $\max$ over q-state values $\implies$ this is \emph{off-policy} learning.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning}
+\end{note}
+
+\begin{note}{Epsilon Greedy}
+	$\epsilon$-Greedy is an exploration policy $\pi_e$ for active RL which explores
+	with (decaying) probability $\epsilon$ and exploits otherwise.
+	$$
+		\pi_e(s) = \begin{cases*}
+			\text{random}\left\{ A(s) \right\} & \text{ with probability } $\epsilon$\\
+			\hat{\pi}^*(s) & \text{ otherwise}
+		\end{cases*}
+	$$
+	\begin{remark} A greedy agent uses 0-greedy exploration.
+		Using $\epsilon > 0$ guarantees convergence to true utilities and optimal policy.
+	\end{remark}\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning, Exploration}
+\end{note}
+
+\begin{note}{Exploration Function}
+	An exploration function $f(s, a)$ encourages exploration by
+	assigning optimistic values $Q^+(s,a)$ to q-states with low attempts $N(s,a)$.
+	\begin{align*}
+		& \textstyle Q^+(s,a) = \sum_{s' \in S} P(s' | s, a) \{ R(s') + \max_{a'} f(s', a') \} \\
+		& \textstyle f(s,a) = Q^+(s,a) + k \cdot N(s,a)^{-1} \quad\quad \text{\footnotesize(example)}
+	\end{align*}
+	\begin{remark} Then the exploration policy is just $\pi_e = \hat{\pi}^*$.
+		This yields faster convergence to the optimal policy, but not values.
+	\end{remark}\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning, Exploration}
+\end{note}
+
+\begin{note}{Exploration Function for Q-Learning}
+	An exploration function $f(s, a)$ can be integrated into the q-learning update
+	as follows:
+	\begin{align*}
+		&\textstyle \Omega \triangleq R(s, a, s') + \gamma \max_{a'} f(s',a')\\
+		&\textstyle Q^+(s,a) \leftarrow (1 - \alpha) Q^+(s,a) + \alpha \Omega 
+	\end{align*}
+	\vspace{-10pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning, Exploration}
+\end{note}
+
+
+% GLIE
+% Multi-Armed Bandits 
+
+\begin{note}{Approximate RL}
+	Function approximation for \emph{model-free} RL uses feature representations $\mathbf{f}(s)$
+	or $\mathbf{f}(s,a)$ to \emph{learn} a weight vector $\mathbf{w}$.
+	$$ \hat{V}(s) = \mathbf{w}^\top \mathbf{f}(s) \quad\quad \hat{Q}(s,a) =  \mathbf{w}^\top \mathbf{f}(s,a) $$
+	\begin{remark} Approximate reinforcement learning in a fully observable environment is similar to \emph{supervised learning}.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning, Approximation}
+\end{note}
+
+\begin{note}{Widrow-Huff Rule}
+	The Widrow-Huff rule for \emph{online least squares} can be used learn weights $\mathbf{w}$ of $\hat{G}(x) = \mathbf{w}^\top \mathbf{f}(x)$
+	with every sample $g(x)$ for some $x$
+	\begin{align*}
+		& \textstyle E(x) =(\hat{G}(x) - g(x))^2 / 2\\
+		& \textstyle w_i \leftarrow w_i - \alpha \cdot \partial E(s)/\partial w_i = w_i + \alpha (g(x) - \hat{G}(x)) f_i(x)
+	\end{align*}
+	\vspace{-10pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning, Approximation}
+\end{note}
+
+\begin{note}{Approximate TD Learning}
+	Using feature representation $\mathbf{f}(s)$ for states, update weight vector $\mathbf{w}$
+	for every sample $R(s, a, s')$:
+	\begin{align*}
+		&\textstyle \Delta \triangleq R(s, a, s') + \gamma \hat{V}(s') - \hat{V}(s)\\
+		&\textstyle w_i \leftarrow w_i + \alpha \Delta f_i(s)
+	\end{align*}%
+	\begin{remark} Widrow-Huff with $g(s) = R(s, a, s') + \gamma \hat{V}(s')$.\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning, Approximation}
+\end{note}
+
+
+\begin{note}{Approximate Q-Learning}
+	Using feature representation $\mathbf{f}(s,a)$ for q-states, update weight vector $\mathbf{w}$
+	for every sample $R(s, \pi_e(s), s')$:
+	\begin{align*}
+		&\textstyle \Delta \triangleq R(s, a, s') + \gamma \max_{a'} \hat{Q}(s',a') - \hat{Q}(s, a)\\
+		&\textstyle w_i \leftarrow w_i + \alpha \Delta f_i(s, a)
+	\end{align*}%
+	\begin{remark} Widrow-Huff with $g(s,a) = R(s, a, s') + \max_{a'} \hat{Q}(s',a') $.\end{remark}
+	\vspace{-5pt}
+	\tags{Uncertainty, Policy Search, Reinforcement Learning, Approximation}
+\end{note}
+
+% Policy Search
+
+%%%%%%%%%%%%%%%%%%% TODO
+
+\begin{question}{Todo}
+	\begin{itemize}
+		\item Genetic Algorithm
+		\item Neural Networks
+		\item Multi-Layer Perceptron
+		\item Back-propagation
+	\end{itemize}
+\end{question}
+
+% 14 Probabilistic Reasoning
+% 15 Probabilistic Reasoning over Time
+% 16 Making Simple Decisions (maybe)
+% 20 Learning Probabilistic Models
+
+% III: Knowledge, Reasoning and Planning
+
+\end{document}
+
+
+
+
