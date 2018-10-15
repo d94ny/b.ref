@@ -195,6 +195,7 @@ select(A, lo, hi, k):
 	\begin{remark} Worst case $O(n^2)$ as for \hyperref[note:Quicksort]{\it quicksort}.
 		Constant memory overhead under tail call optimization or iteration.
 	\end{remark}
+	\begin{remark} To find the $k$-th element we can also use a \hyperref[note:Heap]{\it heap} of size $k$. \end{remark}
 	\vspace{-5pt}
 	\tags{Sorting, Quicksort, Partitioning, Selection}
 \end{note}
@@ -360,6 +361,22 @@ for (i from 1 to d)
 	algorithms.
 	
 	\tags{Graphs, Searching, AI}
+\end{note}
+
+\begin{note}{Iterative Postorder Traversal}
+	To implement an {\it iterative} postorder traversal of
+	a binary tree we can use a stack to perform \hyperref[note:Depth-First Search]{\it depth-first search}
+	and order by decreasing discovery time.
+	\begin{largecode}
+ stack = [root]
+ while (stack)
+ 	x = stack.pop()
+	solution.prepend(x)
+	if (x.left) stack.push(x.left)
+	if (x.right) stack.push(x.right)
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Tree, Traversal}
 \end{note}
 
 % TODO minimum spanning tree MST (Prim & Kruskal)
@@ -1031,6 +1048,388 @@ while (s) A[s.pop()[1]] = -1
 	\begin{remark} This solution can not produce the jump sequence. \end{remark}
 	\vspace{-5pt}
 	\tags{Solution, Frog Problem, Linear}	
+\end{note}
+
+\begin{note}{Closest Stars Problem}
+	Given an array \incode{A} of 3-dimensional coordinates $(x,y,z)$ for $n$ stars,
+	determine the $k$ closest stars to the center of the universe $(0, 0, 0)$,
+	where $k \ll n$.
+	
+	\begin{largecode}
+ input: [(123.8, 86.3, 912.5), ... $\times 10^{12}$ ], k = 10
+ solution: [(54.6, 71.5, 9.1), ...]
+	\end{largecode}
+	\bf Solution \hyperref[note:Closest Stars Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Closest Stars Solution}
+	The \hyperref[note:Closest Stars Problem]{\it closest stars} problem can be solved
+	in $O(n \log k)$ by using a max heap of maximum size $k$ while iterating over the
+	array \incode{A} and progressively replacing the current max with lower stars.
+	
+	\begin{largecode}
+ H = max-heap()
+ for (star in A)
+ 	if (H.size() < k) H.insert(star)
+	else if (H.top() > star)  // compare distance
+		H.pop(); H.insert(star)
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Solution, Heap}
+\end{note}
+
+\begin{note}{Linked List to Binary Search Tree}
+	Given the head to a sorted singly-linked list, return the root of
+	the corresponding balanced binary search tree.
+	
+	\begin{largecode}
+ input: [-10, -3, 0, 5, 9]           // head (-10)
+ solution: [0, -3, 9, -10, null, 5]  // array repr.
+	\end{largecode}
+	\bf Solution \hyperref[note:LL to BST Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{LL to BST Solution}
+	A sorted array can be \hyperref[note:Linked List to Binary Search Tree]{\it converted} to a balanced
+	binary search tree by recursively applying the transformation to two subarrays of equal length.
+	To determine the middle of a linked-list we use the {\it tortoise and the hare} method.
+	
+	\begin{largecode}
+ toBST(head, tail)
+ 	if (head == tail) return NULL
+	slow = fast = head
+	while (fast != tail && fast.next != tail)
+		slow = slow.next; fast = fast.next.next  // *
+	root = Node(slow.value)
+	root.left = toBST(head, slow)
+	root.right = toBST(slow.next, tail)
+	return root
+ toBST(root, NULL)  // for solution
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Solution, Linked-List, Binary Search Tree, Rabbit and Hare}
+\end{note}
+
+\begin{note}{k-Sum Tree Paths}
+	Given the root of a binary tree, determine all paths from the root to a leaf with
+	sum equal to a given $k$.
+	
+	\begin{largecode}
+ input: root, k = 22
+ solution: [[5, 4, 11, 2], [5, 8, 4, 5]]
+	\end{largecode}
+	\bf Solution \hyperref[note:k-Sum Tree Paths Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{k-Sum Tree Paths Solution}
+	The \hyperref[note:k-Sum Tree Paths]{\it k-sum tree paths} problem can be solved recursively
+	using a single auxiliary list \incode{c = []} and the following helper function.
+	\begin{largecode}
+ helper(node, k, c, solution)
+ 	if (node == NULL) return
+	c.push_back(node)
+	if (node.is_leaf() and node.val == k)
+		result.push_back(c) // copy!
+	else
+		helper(node.left, k - node.val, c, solution)
+		helper(node.left, k - node.val, c, solution)
+	c.pop_back()
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Tree, Recursion}
+\end{note}
+
+\begin{note}{Lonely Number Problem}
+	Given an unordered array \incode{A} of integers, determine the only element which does not appear twice.
+	\begin{largecode}
+ input: [3, 5, 2, 1, 4, 3, 1, 5, 4]
+ solution: 2
+	\end{largecode}
+	\bf Solution \hyperref[note:XOR Reduction]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{XOR Reduction}
+	The \hyperref[note:Lonely Number Problem]{\it lonely number problem} can easily be
+	solved in linear time and without additional memory by performing a bitwise XOR reduction
+	over the array, since \incode{a\textasciicircum a = 0} and \incode{a\textasciicircum 0 = a}.
+	\begin{largecode}
+ // python & C++
+ reduce(lambda x, y: x ^ y, A)
+ accumulate(A.begin(), A.end(), 0, bit_xor<int>());
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Bit, XOR, Reduction, Solution}
+\end{note}
+
+\begin{note}{Trapped Rain Water}
+	Given an array \incode{height} of non-negative integers representing an elevation map,
+	compute how much water it is able to trap.
+	
+	\begin{largecode}
+ input: [0,1,0,2,1,0,1,3,2,1,2,1]
+ solution: 6
+       #
+   #ooo##o#
+ #o##o######
+	\end{largecode}
+	\bf Solutions \hyperref[note:Trapped Rain Water DP]{\solutionref}
+		\hyperref[note:Trapped Rain Water Stack]{\solutionref}
+		\hyperref[note:Trapped Rain Water Pointers]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Trapped Rain Water DP}
+	The \hyperref[note:Trapped Rain Water]{\it trapped rain water} problem can be solved using dynamic
+	programming. The water trapped at every position \incode{i} can simply be computed using the highest bars to its
+	left and right.
+	
+	\begin{largecode}
+ for (i from 1 to n)
+ 	leftmax[i] = max(leftmax[i-1], h[i])
+ for (i from n to 1)
+ 	rightmax[i] = max(rightmax[i+1], h[i])
+ for (i from 1 to n)
+ 	water += min(leftmax[i], rightmax[i]) - h[i]
+	\end{largecode}
+	\begin{remark}
+		We here think {\it vertically} instead of horizontally.
+		For the latter, see this \hyperref[note:Trapped Rain Water Stack]{\it solution} using stacks.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Trapped Rain Water, Dynamic Programming}
+\end{note}
+
+\begin{note}{Trapped Rain Water Stack}
+	The \hyperref[note:Trapped Rain Water]{\it trapped rain water} problem can be solved using a stack
+	onto which we push every position \incode{i} and then retroactively flood them when
+	encountering higher terrain.
+	
+	\begin{largecode}
+ for (i from 1 to n)
+ 	while (stack and h[stack.top] < h[i])
+		t = stack.pop()
+		distance = i - stack.top() - 1
+		height_diff = min(h[i], h[stack.top()]) - h[t]
+		water += distance * height_diff
+	stack.push(i) 
+	\end{largecode}
+	\begin{remark} The stack always contains decreasing heights.
+		Similar to the \hyperref[note:NGE Solution]{\it next greater element} solution.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Trapped Rain Water, Dynamic Programming}
+\end{note}
+
+% TODO pointers?
+
+\begin{note}{Merge k Sorted Lists}
+	Merge $k$ sorted linked lists and return it as one sorted list.
+	
+	\begin{largecode}
+ input: [1->4->5, 1->3->4, 2->6]
+ solution: 1->1->2->3->4->4->5->6
+	\end{largecode}
+	\bf Solutions \hyperref[note:Merge Sorted Lists with Max Heap]{\solutionref} \hyperref[note:Divide and Merge Sorted Lists]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Merge Sorted Lists with Max Heap}
+	We can \hyperref[note:Merge k Sorted Lists]{\it merge k sorted lists} by maintaining $k$ pointers to the beginning
+	of each list and progressively picking the lowest element. The latter operation can be optimized using a \hyperref[note:Heap]{\it min heap}
+	of size $k$.
+	
+	\begin{largecode}
+ h = min-heap
+ for (head in list-heads) h.add(head, head.val)
+ while h not empty:
+ 	node = h.pop()
+	copy node to new list
+	if (node.next) h.add(node.next, node.next.val)
+	\end{largecode}
+
+	\begin{remark} A more space-efficient \hyperref[note:Divide and Merge Sorted Lists]{\it solution} also exists. \end{remark}\vspace{-5pt}
+	\tags{Solution, Max Heap, Linked List, Sort}
+\end{note}
+
+\begin{note}{Divide and Merge Sorted Lists}
+	We can \hyperref[note:Merge k Sorted Lists]{\it merge k sorted lists} using divide-and-conquer by
+	successively merging pairs of lists in place.
+	
+	\begin{largecode}
+ amount = len(lists), interval = 1
+ while true:
+ 	for (i from 0 to amount - interval by interval * 2)
+		merge2lists(lists[i], lists[i+1])
+	interval *= 2
+	\end{largecode}
+	\begin{remark} linear and in-place \incode{merge2lists} left as an exercise. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Divide and Conquer, Linked List, Sort}
+\end{note}
+
+\begin{note}{Largest Rectangle in Histogram}
+	Given an array \incode{h} of bar heights for a histogram,
+	determine the largest area of a rectangle contained inside \incode{h}.
+	
+	\begin{largecode}
+ input: [2, 1, 5, 6, 2, 3]
+ solution: 10
+	\end{largecode}
+	\bf Solution \hyperref[note:Linear Largest Rectangle]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Linear Largest Rectangle}
+	To find the \hyperref[note:Largest Rectangle in Histogram]{\it largest rectangle} in a histogram
+	we determine for every bar the first smaller bars on either side. We push every element onto
+	a stack, and pop them when we encounter a smaller bar \incode{i}. Then bar \incode{s.top} is
+	bounded by \incode{s.top.top} and \incode{i}.
+	
+	\begin{largecode}
+ s = stack, h.push_back(0) // sentinel
+ for (i from 1 to n)
+ 	while (s and h[s.top] >= h[i])
+		height = h[s.pop()]
+		left = s ? s.top : -1
+		largest = max(largest, height * (i - left - 1)
+	s.push(i)
+	\end{largecode}
+	\begin{remark}
+		The stack \incode{s} always contains increasing bars.
+		Similar to the \hyperref[note:NGE Solution]{\it next greater element}
+		or \hyperref[note:Trapped Rain Water Stack]{\it trapped rain water} solution.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Stack, Largest Rectangle}
+\end{note}
+
+\begin{note}{Binary Tree Maximum Path}
+	Given the \incode{root} to a non-empty binary tree, find the path between
+	any two nodes with maximum sum.
+	
+	\begin{largecode}
+ input: [-10, 9, 20, null, null, 15, 7]
+ solution: 42  // 15->20->7 
+	\end{largecode}
+	
+	\bf Solution \hyperref[note:Binary Tree Maximum Path Recursion]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Binary Tree Maximum Path Recursion}
+	We can determine the \hyperref[note:Binary Tree Maximum Path]{\it path with maximum sum} in a binary tree recursively,
+	using a function returning the maximum path {\it ending} in a given node while also maintaining a {\it global} maximum.
+	
+	\begin{largecode}
+ maxSumToNode(node):
+ 	if (node == NULL) return 0
+	left = max(0, maxSumToNode(node->left))
+	right = max(0, maxSumToNode(node->right))
+	
+	solution = max(solution, left + right + node->val)
+	return max(left, right) + node->val
+	\end{largecode}
+	\begin{remark}
+		Use common dynamic programming subtree optimality.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution}
+\end{note}
+
+\begin{note}{Longest Consecutive Sequence}
+	Given an unsorted array \incode{A} of integers, determine the length of the longest arbitrary sequence
+	of consecutive elements.
+	
+	\begin{largecode}
+ input: [4, 8, 1, 6, 3, 9, 2]
+ solution: 4  // [1, 2, 3, 4]
+	\end{largecode}
+	\bf Solution \hyperref[note:Longest Consecutive Sequence Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Longest Consecutive Sequence Solution}
+	We can determine the length of the \hyperref[note:Longest Consecutive Sequence]{\it longest consecutive sequence}
+	of an array \incode{A} linearly by creating a set of all elements, before counting all successors for every element
+	which has to be the {\it beginning} of some sequence.
+	
+	\begin{largecode}
+ s = set(A), longest = 0
+ for (i in A)
+ 	if (!s.contains(i-1)) // beginning!
+		streak = 1
+		next = i + 1
+		while (s.contains(next++)) streak++
+		longest = max(longest, streak)
+return longest
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Solution, Set, Longest Consecutive Sequence}
+\end{note}
+
+\begin{note}{Bursting Balloons}
+	Given an array \incode{B} of balloons, bursting balloon \incode{i}
+	yields \incode{B[left]} $\times$ \incode{B[i]} $\times$ \incode{B[right]} coins, where \incode{left} and \incode{right} are
+	its neighbors. Determine the maximum sum of coins achievable.
+
+	\begin{largecode}
+ input: [3,1,5,8]
+ solution: 167  // 3*1*5 + 3*5*8 + 3*8 + 8
+	\end{largecode}
+	\bf Solution \hyperref[note:Bursting Balloons DP]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Bursting Balloons DP}
+	The \hyperref[note:Bursting Balloons]{\it bursting balloons} problem can be solved using dynamic programming,
+	using \incode{dp[i][j]} as the maximum coins from bursting balloons in \emph{range} \incode{i..j}.
+	We divide each range using the \emph{last} balloon to burst,
+	which will yield \incode{B[i-1]} $\times$ \incode{B[last]} $\times$ \incode{B[j+1]} coins.
+	%$$
+	%	d_{i,j} = \max_{x \in [i,j]} \left\{ d_{i,x-1} + d_{x+1,j} + \left( b_{i-1} \cdot b_x \cdot b_{j+1} \right) \right\}
+	%$$
+	\begin{largecode}
+ // add sentinel 1 around B
+ for (k from 1 to n)  // length of range
+   for (left from 1 to n-k+1)
+     right = left + k
+     for (last from left to right)
+       coins = B[left-1] * B[last] * B[right+1]
+       dp[left][right] = max(dp[left][right],
+         coins + dp[left][last-1] + dp[last+1][right])
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Solution, Dynamic Programming, Divide and Conquer, Bursting Balloons, Range}
+\end{note}
+
+\begin{note}{Median of Sorted Arrays}
+	Determine the median of two sorted arrays \incode{A} and \incode{B} of
+	size $n$ and $m$ respectively in runtime complexity $\log (n + m)$.
+
+	\begin{largecode}
+ input: [1, 3, 5, 8, 9], [0, 2, 4, 6, 7]
+ solution: 4.5  // 0,1,2,3,4 - 5,6,7,8,9
+	\end{largecode}
+	\bf Solution \hyperref[note:Median of Sorted Arrays Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Median of Sorted Arrays Solution}
+	The \hyperref[note:Median of Sorted Arrays]{\it median of two sorted arrays} can be found by
+	searching the element $k = (n+m)/2$. 
+	Compare element $k/2$ of each array. If \incode{A[k] > B[k]} the median can't be in \incode{B[..k]}.
+	Discard the correct subarray and repeat with element $k - k/2$.
+	
+	\begin{largecode}
+ findK(k, A, B)
+ 	...
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Solution, Divide and Conquer, Median}
 \end{note}
 
 \end{document}
