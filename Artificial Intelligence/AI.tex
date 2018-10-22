@@ -1,6 +1,7 @@
 \documentclass{cognito}
 \usepackage{lmodern}
 \usepackage{mathtools}
+\usepackage{bm}
 
 \begin{document}
 
@@ -857,6 +858,11 @@ for $X_i$ in Topologic[$X_1$, ..., $X_n$] do
 		\item Neural Networks
 		\item Multi-Layer Perceptron
 		\item Back-propagation
+		\item SVM
+		\item Gradient Boosting Machines
+		\item CNNets
+		\item K-Means
+		\item Logistic Regression
 	\end{itemize}
 \end{question}
 
@@ -866,6 +872,54 @@ for $X_i$ in Topologic[$X_1$, ..., $X_n$] do
 % 20 Learning Probabilistic Models
 
 % III: Knowledge, Reasoning and Planning
+
+\begin{note}{MNIST in Keras}
+	Loading and inspecting the {\it MNIST} dataset in Python using packages \incode{keras} and \incode{Tensorflow}
+	are done as follows.
+	\begin{largecode}
+ from keras.datasets import mnist
+ (train_images, train_labels),
+ 	(test_images, test_labels) = mnist.load_data()
+	\end{largecode}
+	\vspace{-5pt}
+	\begin{largecode}
+ plt.imshow(train_images[0], cmap=plt.cm.binary) 
+ plt.show()
+	\end{largecode}
+	\begin{remark} For Mac OS \incode{10.10} use \incode{tf == 1.4.0} and \incode{keras == 2.1.3}. \end{remark}\vspace{-5pt}
+	\tags{Deep Learning, MNIST, Keras, Tensorflow, Python}
+\end{note}
+
+%% HOW to build a simple model
+%% how to compile it, then train/fit it! ~ similar to R
+
+\begin{note}{Softmax Function}
+	The softmax or {\it normalized exponential} function $\sigma$ is a generalization of the {\it logit function}
+	which "smashes" an arbitrary vector to a categorical distribution, $\sigma : \bm z \in \mathbb{R}^K \to (0, 1)^K$.
+	$$
+		\sigma(\bm z)_i = \frac{e^{z_i}}{\sum_j e^{z_j}}, \quad \quad \sum_i \sigma(\bm z)_i = 1
+	$$
+	\begin{remark} $\sigma$ is used is {\it multiclass classification},  linear discriminant analysis, naive Bayes classifiers, and artificial neural networks.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Deep Learning, Neural Network, Activation}
+\end{note}
+
+%% Activation Functions:
+% Logit function
+% Relu Function
+% Sigmoid Function
+
+%% Loss functions
+% Crossentropy
+
+%% Common Models/Layers
+% ...
+
+%% Optimizer
+% RMSprop
+
+% soooo much stuff here
 
 \end{document}
 

@@ -98,6 +98,31 @@
 	\tags{Sorting, Comparison, Heap}
 \end{note}
 
+\begin{note}{Selection Sort}
+	\begin{mdframed}[linecolor=black!25!white]%%
+	\begin{tabular}{@{} c | c | c | c  @{}}
+		\bf average & \bf worst & \bf memory & \bf stable \\
+		$n^2$ & $n^2$ & $1$ & $\checkmark$
+	\end{tabular}%
+	\end{mdframed}
+	\incode{selection-sort} is an inefficient sorting algorithm
+	progressively finding the {\it smallest} element to grow a sorted subarray.
+	
+	\begin{largecode}
+ for (i from 0 to n-2)
+ 	x = a[i]
+	for (j from i to n-1) x = min(x, a[j])
+	a[i] = x
+	\end{largecode}
+	\begin{remark} Similar to \hyperref[note:Insertion Sort]{\it insertion sort}.
+		A bidirectional variant finding both minimum and maximum each iteration is {\it cocktail sort}.
+	\end{remark}\vspace{-5pt}
+	\tags{Sorting, Comparison}
+\end{note}
+
+% Buuble sort = lots of swaps 
+% Insertion sort = insert current element into right position in sorted array
+
 \begin{note}{Quicksort}
 	\begin{mdframed}[linecolor=black!25!white]%%
 	\begin{tabular}{@{} c | c | c | c  @{}}
@@ -321,11 +346,14 @@ for (i from 1 to d)
 	\end{largecode}%
 	\begin{remark} A non-recursive implementation uses a stack. \end{remark}
 	\begin{remark}
-	Applications include \hyperref[note:Topological Sort]{\it topological sort}
-	and finding strongly connected \hyperref[note:Strongly Connected Components]{\it components}. \end{remark}
+	Applications include \hyperref[note:Topological Sort]{\it topological sort}, 
+	finding strongly connected \hyperref[note:Strongly Connected Components]{\it components}
+	or labeling {\it node sets, i.e. deapth-first trees}. \end{remark}
 	\vspace{-5pt}
 	\tags{Graphs, Searching, Traversing}
 \end{note}
+
+% TODO Union-Find !
 
 \begin{note}{Topological Sort}
 	\incode{topological-sort} produces a linear ordering $\prec$ in a directed acyclic graph $G$
@@ -375,11 +403,97 @@ for (i from 1 to d)
 	if (x.left) stack.push(x.left)
 	if (x.right) stack.push(x.right)
 	\end{largecode}
+	\begin{remark} Preorder traversal is achieved using the same logic.
+		Consider the similarities between recursion and a stack here.
+	\end{remark}
 	\vspace{-5pt}
 	\tags{Tree, Traversal}
 \end{note}
 
 % TODO minimum spanning tree MST (Prim & Kruskal)
+
+\begin{note}{Disjoint-Set Data Structure}
+	A {\it disjoint-set} or {\it union-find} data structure
+	tracks a set of elements partitioned into a number of disjoint subsets using
+	a {\it representative} node for every subset.
+	\begin{mdframed}[linecolor=black!25!white]%%
+	\begin{tabular}{@{} c | c | c r @{}}
+			{\bf make set} &
+			\hyperref[note:Disjoint-Set Structure Find]{\bf find} &
+			\hyperref[note:Disjoint-Set Structure Union]{\bf union}\\
+		$1$ & $n^*$ & $n^*$ & \scriptsize \hspace{65pt} (*) if optimized $\alpha(n)$
+	\end{tabular}%
+	\end{mdframed}
+	
+	\begin{remark} Used by \hyperref[note:Kruskal's Algorithm]{\it Kruskal's algorithm} for minimum spanning trees. \end{remark}\vspace{-5pt}
+	\tags{Data Structure, Set, Disjoint-Set, Union-Find}
+\end{note}
+
+\begin{note}{Disjoint-Set Structure Find}
+	The \incode{find} function of a \hyperref[note:Disjoint-Set Data Structure]{\it disjoint-set} data structure
+	determines the representative of the set for a given element \incode{x}.
+	\begin{largecode}
+ find(x):
+ 	if (x.parent != x) x.parent = find(x.parent)
+	return x.parent
+	\end{largecode}
+	\begin{remark} This \incode{find} uses {\it path compression} to flatten the tree structure.
+	Alternate optimizations are {\it path halving} and {\it path splitting}. \end{remark}
+	\vspace{-5pt}
+	\tags{Data Structure, Set, Disjoint-Set, Union-Find}
+\end{note}
+
+\begin{note}{Disjoint-Set Structure Union}
+	The \incode{union} function of a \hyperref[note:Disjoint-Set Data Structure]{\it disjoint-set} data structure merges two sets
+	by determining a common representative by {\it rank} or {\it size}.
+	
+	\begin{largecode}
+ union(x, y)  // by size
+ 	xroot, yroot = find(x), find(y)
+	if (xroot.size < yroot.size) swap(xroot, yroot)
+	yroot.parent = xroot
+	xroot += yroot.size
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Data Structure, Set, Disjoint-Set, Union-Find}
+\end{note}
+
+\begin{note}{Kruskal's Algorithm}
+	\begin{mdframed}[linecolor=black!25!white]
+		\bf running time $O(E \log E)$
+	\end{mdframed}
+	Kruskal's algorithm finds the {\it minimum spanning tree} of a graph by greedily adding edges of increasing weight
+	using \hyperref[note:Disjoint-Set Data Structure]{\it Union-Find}.
+	
+	\begin{largecode}
+ for v in V: make-set(v)
+ for (u,v) in E ordered by weight:
+ 	if find(u) != find(v):
+		A = A $\cup$ {(u,v)}
+		union(u, v)
+	\end{largecode}
+	\begin{remark} See related \hyperref[note:Prim's Algorithm]{\it Prim's algorithm}.\end{remark}\vspace{-5pt}
+	\tags{Minimum Spanning Tree, Union-Find, Greedy}
+\end{note}
+
+\begin{note}{Prim's Algorithm}
+	\begin{mdframed}[linecolor=black!25!white]
+		\bf running time $O(E \log V)$ or $O(E + V \log V)$
+	\end{mdframed}
+	Prim's algorithm finds the {\it minimum spanning tree} of a graph by starting at any vertex and greedily adding
+	the cheapest {\it connection}.
+	\begin{largecode}
+ C[v] = $\infty$ for all v  // cheapest connection to v
+ E[v] = $\emptyset$ for all v   // corresponding edge
+ Q = V
+ while Q:
+ 	extract v from Q with min C[v]
+	add v to F, and also E[v] if not $\emptyset$
+	update E[w], C[w] for all (v, w) in E
+	\end{largecode}
+	\begin{remark} See related \hyperref[note:Kruskal's Algorithm]{\it Kruskal's algorithm}.\end{remark}\vspace{-5pt}
+	\tags{Minimum Spanning Tree, Union-Find, Greedy}
+\end{note}
 
 \begin{note}{Bellman-Ford Algorithm}
 	\begin{mdframed}[linecolor=black!25!white]
@@ -450,6 +564,18 @@ for (i from 1 to d)
 %	\end{largecode}
 	\vspace{-10pt}
 	\tags{Graphs, Searching, Shortest Path, All-pairs, Dynamic Programming}
+\end{note}
+
+\begin{note}{Hierholzer Algorithm}
+	Given a directed graph, {\it Hierholzer's} algorithm finds an {\it Euler circuit}, i.e.
+	 a path that traverses every edge of the graph and ends on the starting vertex,
+	in linear $O(E)$ time.
+	 %% TODO! 
+	 \begin{largecode}
+ TODO!
+	 \end{largecode}
+	 \vspace{-5pt}
+	 \tags{Graphs, Traversal, Single-Source, Euler Circuit}
 \end{note}
 
 %% TODO : Maximum Flows
@@ -541,8 +667,8 @@ for (i from 1 to d)
 	Define $c_{ij}$ the length of the LCS of the prefix sequences $X_{1..i}$ and $Y_{1..j}$.
 	$$
 		c_{ij} = \begin{dcases}
-			c_{i-1,j-1} + 1 & \text{ if } x_i = x_j\\
-			\max\{ c_{i,j-1}, c_{i-1,j} \} & \text{ if } x_i \neq x_j
+			c_{i-1,j-1} + 1 & \text{ if } x_i = y_j\\
+			\max\{ c_{i,j-1}, c_{i-1,j} \} & \text{ if } x_i \neq y_j
 		\end{dcases}
 	$$
 	For the optimal solution use auxiliary table $b_{ij} \in \{\uparrow, \nwarrow, \leftarrow \}$ to record
@@ -555,6 +681,67 @@ for (i from 1 to d)
 % TODO Longest Simple Path in DAG
 % TODO Edit Distance
 
+\begin{note}{Edit Distance}
+	Given two strings \incode{x}, \incode{y}, determine their {\it edit distance}, i.e.
+	the minimum number of character operations $\in$ \{\incode{insert}, \incode{replace}, \incode{delete}\}
+	to transform one string into the other.
+	
+	\begin{largecode}
+ input: horse, ros
+ output: 3  // horse -> rorse -> rose -> ros
+	\end{largecode}
+	\bf Solution \hyperref[note:Edit Distance Algorithm]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Edit Distance Algorithm}
+	We determine the \hyperref[note:Edit Distance]{\it edit distance} between two strings using dynamic programming
+	through \incode{dp[i,j]} defined as the edit distance between the substrings \incode{x[..i-1]} and \incode{y[..j-1]}.
+	$$
+		d_{i,j} = \begin{dcases}
+			d_{i-1,j-1} & \text{ if } x_{i-1} = y_{j-1}\\
+			1 + \min\{d_{i-1,j-1}, d_{i,j-1},d_{i-1,j}\} & \text{ otherwise}
+		\end{dcases}
+	$$
+	\vspace{-5pt}
+	\begin{remark} Remember DP paradigm of using {\it right-bound} substrings!
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Dynamic Programming, Edit Distance}
+\end{note}
+
+\begin{note}{Distinct Subsequences}
+	Given two strings \incode{s} and \incode{t}, determine
+	the number of distinct subsequences of \incode{t} in \incode{s}.
+	
+	\begin{largecode}
+ input: s = "babgbag", t = "bag"
+ solution: 5  // 124, 127, 167, 367, 567
+	\end{largecode}
+	
+	\bf Solution \hyperref[note:Distinct Subsequences DP]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Distinct Subsequences DP}
+	The number of \hyperref[note:Distinct Subsequences]{\it distinct subsequences} of \incode{t} in \incode{s}
+	is determined through dynamic programming using \incode{dp[i,j]} as the number of distinct subsequences
+	of \incode{t[..j-1]} in \incode{s[..i-1]}.
+	$$
+		d_{i,j} = \begin{dcases}
+			d_{i-1, j} & \text{ if } s_{i-1} \neq s_{j-1}\\
+			d_{i-1, j} + d_{i-1, j-1} & \text{ otherwise}
+		\end{dcases}
+	$$
+	\vspace{-5pt}
+	\begin{remark}
+		Initialize with \incode{dp[i,j] = (j == 0) ? 1 : 0}.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Dynamic Programming, Distinct Subsequences}
+\end{note}
+
+% Longest Palindrome Substring
 
 \begin{note}{Maximum Subarray Problem}
 	Given a one-dimensional array of numbers, determine the continuous subarray with maximum sum.
@@ -789,8 +976,71 @@ for (j from 1 to k)
 	assign i to j
 	r[j] = f[i]
 	\end{largecode}
+	\begin{remark}  See related problem \hyperref[note:Meeting Rooms]{\it Meeting Rooms}. \end{remark}
 	\vspace{-5pt}
 	\tags{Greedy, Solution, Interval Partition}
+\end{note}
+
+\begin{note}{Meeting Rooms}
+	Given starting times $s_i$ and finishing times $f_i$ of $n$ intervals,
+	determine the maximum number of incompatible intervals.
+	\begin{largecode}
+ input: s = [1, 3, 0, 5, 8, 5]
+        f = [2, 4, 6, 7, 9, 9]
+ solution: 3  // (0, 6) $\times$ (5, 7) $\times$ (5, 9)
+	\end{largecode}
+	\bf Solution \hyperref[note:Meeting Rooms Algorithm]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Meeting Rooms Algorithm}
+	To determine the maximum number of \hyperref[note:Meeting Rooms]{\it incompatible intervals},
+	we {\it encode} each timestamp $t \in \{s_i, f_i\}$ to a pair \incode{(t, \{-1, 1\})}.
+
+	\begin{largecode}
+ bounds = []
+ for (interval in intervals)
+ 	bounds.push((interval.s, 1))  // start => new room
+	bounds.push((interval.f, -1)) // end => free room
+ sort(bounds)
+ rooms = 0, max_rooms = 0
+ for (bound in bounds)
+ 	rooms += bound.second
+	max_rooms = max(max_rooms, rooms)
+	\end{largecode}
+	\begin{remark} See related problem \hyperref[note:Interval Partitioning Problem]{\it Interval Partitioning Problem}.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Intervals}
+\end{note}
+
+\begin{note}{Non-Overlapping Intervals}
+	Given starting times $s_i$ and finishing times $f_i$ of $n$ intervals,
+	determine the minimum number of intervals to be discarded to 
+	render all remaining non-overlapping.
+	
+	\begin{largecode}
+ input: [[1,2], [2,3], [3,4], [1,3]]
+ solution: 1 // remove [1, 3]
+	\end{largecode}
+	\bf Solution \hyperref[note:Non-Overlapping Intervals Algorithm]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Non-Overlapping Intervals Algorithm}
+	To determine the minimum number of \hyperref[note:Non-Overlapping Intervals]{\it intervals to be discarded}
+	we can directly apply the solution to the \hyperref[note:Interval Selection Problem]{\it interval selection problem},
+	but instead return the opposite.
+	
+	\begin{largecode}
+ sort intervals by increasing ending time $f_i$
+ removed = 0, current_end = $-\infty$
+ for (i in intervals):
+ 	if (i.start < current_end) removed++
+	else current_end = max(current_end, i.end)
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Solution, Intervals}
 \end{note}
 
 \begin{note}{Next Greater Element}
@@ -1094,7 +1344,7 @@ while (s) A[s.pop()[1]] = -1
 \begin{note}{LL to BST Solution}
 	A sorted array can be \hyperref[note:Linked List to Binary Search Tree]{\it converted} to a balanced
 	binary search tree by recursively applying the transformation to two subarrays of equal length.
-	To determine the middle of a linked-list we use the {\it tortoise and the hare} method.
+	To determine the middle of a linked-list we use the {\it Tortoise and the Hare} method.
 	
 	\begin{largecode}
  toBST(head, tail)
@@ -1109,7 +1359,7 @@ while (s) A[s.pop()[1]] = -1
  toBST(root, NULL)  // for solution
 	\end{largecode}
 	\vspace{-5pt}
-	\tags{Solution, Linked-List, Binary Search Tree, Rabbit and Hare}
+	\tags{Solution, Linked-List, Binary Search Tree, Tortoise and Hare}
 \end{note}
 
 \begin{note}{k-Sum Tree Paths}
@@ -1430,6 +1680,352 @@ return longest
 	\end{largecode}
 	\vspace{-5pt}
 	\tags{Solution, Divide and Conquer, Median}
+\end{note}
+
+\begin{note}{Sorted Matrix Search}
+	Given a two-dimensional $m \times n$ matrix \incode{M} such that each row and column is sorted,
+	determine whether \incode{M} contains the target \incode{t}.
+	
+	\begin{largecode}
+ input: [ [1, 4, 7],
+          [2, 8, 9],
+          [4, 6, 11] ],  target = 8
+ solution: true
+	\end{largecode}
+	\bf Solution \hyperref[note:Linear Sorted Matrix Search]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Linear Sorted Matrix Search}
+	To search an element in a \hyperref[note:Sorted Matrix Search]{\it sorted matrix} \incode{M}
+	in linear $O(m + n)$ runtime, begin from the bottom left corner and move each axis in
+	only one direction, according to \incode{M[x][y]} and \incode{target}.
+	
+	\begin{largecode}
+ x = m, y = 0
+ while (x >= 0 and y <= n)
+ 	if (M[x][y] > target) x--       // down one row
+	else if (M[x][y] < target) y++  // right one col
+	else return true
+	\end{largecode}
+	\begin{remark}
+		Think about why we can't miss \incode{target}.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Matrix, Search}
+\end{note}
+
+\begin{note}{Uniform Stream Sampling}
+	Given a stream $S$ of unknown length, produce a uniform random sample of size $k$
+	with limited $O(k)$ storage.
+
+	\begin{largecode}
+ input: S = [2, 4, 7, 9, ... $\times 10^{100}$, 8, 5, 1], k = 5
+ solution: [5, 7, 3, 1, 2]
+	\end{largecode}
+	\bf Solution \hyperref[note:Reservoir Sampling]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Reservoir Sampling}
+	To produce a \hyperref[note:Uniform Stream Sampling]{\it uniform sample from a large stream} with limited
+	memory, we apply the {\it reservoir sampling} or \incode{R} algorithm: replace a random element from the
+	reservoir with every new element $s_i$ with probability $p = k/i$.
+%	\begin{enumerate}
+% \item  pick new element $s_i$ with probability $p = k/i$
+% \item if $s_i$ is selected, remove a random element from the reservoir
+%	\end{enumerate}
+	\begin{largecode}
+ for i from k+1 to n
+ 	j = random(1, i)  // inclusive
+	if (j <= k) R[j] = S[i]
+	\end{largecode}
+ Before $s_i$, elements are in the reservoir with probability $k/(i-1)$.
+ Multiplying this by the probability of remaining selected we get:
+ $$
+ 	p = \frac{k}{i-1}\left\{\frac{i-k}{i} + \frac{k}{i} \cdot \frac{k-1}{k} \right\} = \frac{k}{n+1}
+ $$
+	\vspace{-10pt}
+	\tags{Solution, Random Sampling, Stream}
+\end{note}
+
+\begin{note}{Reverse Interleave Linked List}
+	Given a singly linked list \incode{L}, reorder it 
+	by interleaving elements from each end as follows:
+	\begin{largecode}
+ input: L = [l0, l1, l2, ..., lx, ly, lz]
+ solution: [l0, lz, l1, ly, l2, lx, ... ]
+	\end{largecode}
+	\bf Solution \hyperref[note:Reverse Interleave Linked List Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Reverse Interleave Linked List Solution}
+	A linked list \incode{L} can be \hyperref[note:Reverse Interleave Linked List]{\it reversely interleaved}
+	by simply reversing the second half found using the {\it Tortoise and the Hare} method, before
+	merging the two halves.
+	\begin{largecode}
+ slow = root, fast = root
+ while (fast != NULL && fast.next != NULL)
+ 	slow = slow.next, fast = fast.next.next
+ end = reverse(slow)  // end points to lz
+ return merge(root, end)
+	\end{largecode}
+	\begin{remark} Linear in-place \incode{reverse} and \incode{merge} left as exercise.
+		A similar approach can determine if \incode{L} is \emph{was} a palindrome.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Linked List, Merge, Reverse, Interleave, Tortoise and the Hare}
+\end{note}
+
+\begin{note}{Binary Tree Levels}
+	Given the \incode{root} of a binary tree, return a list of its levels or layers.
+	
+	\begin{largecode}
+ input: [3, 9, 20, $\emptyset$, $\emptyset$, 15, 7]
+ solution: [[3], [9, 20], [15, 7]]
+	\end{largecode}
+	\bf Solution \hyperref[note:Binary Tree Level Traversal]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Binary Tree Level Traversal}
+	The \hyperref[note:Binary Tree Levels]{\it levels of a binary tree} can be produced by using \hyperref[note:Breadth-First Search]{\it breadth-first search}
+	with an additional internal loop over every level.
+	\begin{largecode}
+ results = [] // if root != null
+ q = queue(root)
+ while queue:
+ 	layer = []
+	size = q.size()
+	for i from 1 to size: // iterate over layer
+ 		x = q.pop()
+		layer.push(x)
+		if (x.left) q.push(left)
+		if (x.right) q.push(right)
+	results.push(layer)
+	\end{largecode}
+	\begin{remark} Alternatively remember the last node of each layer. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Breadth-First Search, Queue, Levels, Binary Tree}
+\end{note}
+
+\begin{note}{Binary Tree Right View}
+	Given the \incode{root} of a binary tree, return
+	its right view, i.e. the right-most node of every level
+	
+	\begin{largecode}
+ input: [3, 9, 20, 5, $\emptyset$, 15, 7, 1]
+ solution: [3, 20, 7, 1]
+	\end{largecode}
+	\bf Solution \hyperref[note:Binary Tree Right View Traversal]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Binary Tree Right View Traversal}
+	To determine the \hyperref[note:Binary Tree Right View]{\it right view of a binary tree}
+	we use a a \hyperref[note:Binary Tree Level Traversal]{\it level traversal} and output
+	the last element of each layer.
+	
+	\begin{largecode}
+ q = queue(root)
+ while queue:
+ 	s = q.size()
+	for i from 1 to s:	  // layer loop
+		x = q.pop()
+		if i == s: results.push_back(x) // last element
+		if (x.left) q.push(x.left)
+		if (x.right) q.push(x.right)
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Solution, Breadth-First Search, Queue, Levels, Binary Tree}
+\end{note}
+
+\begin{note}{Symmetric Binary Tree}
+	Given the \incode{root} to a binary tree, determine whether the tree is symmetric along
+	its vertical center axis, i.e. a mirror of itself.
+	
+	\begin{largecode}
+ input: [1, 2, 2, 3, 4, 4, 3], [1, 2, 2, 0, 3, 0, 3]
+ solution: true, false
+	\end{largecode}
+	\bf Solution \hyperref[note:Recursive Binary Tree Symmetry]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Recursive Binary Tree Symmetry}
+	To determine whether a \hyperref[note:Symmetric Binary Tree]{\it binary tree is symmetric}, we use
+	recursion over symmetric paths to the leaves.
+	
+	\begin{largecode}
+ bool symmetric(left, right)
+ 	if (left == null and right == null) return true
+	if (left == null or right == null) return false
+	if (left.value != right.value) return false
+	
+	return (symmetric(left.left, right.right) &&
+		    symmetric(left.right, right.left))
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Solution, Binary Tree, Symmetric, Recursion}
+\end{note}
+
+\begin{note}{Lowest Common Ancestor}
+	Given the \incode{root} to a {\it binary tree} and two nodes \incode{p} and \incode{q},
+	determine their lowest common ancestor.
+
+	\begin{largecode}
+ input:  [3, 5, 1, 6, 2, 0, 8, $\emptyset$, $\emptyset$, 7, 4], p = 7, q = 6
+ solution: 5
+ 	\end{largecode}
+	\bf Solution \hyperref[note:Recursive Lowest Common Ancestor]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Recursive Lowest Common Ancestor}
+	To determine \hyperref[note:Lowest Common Ancestor]{\it lowest common ancestor} in a binary tree,
+	we use recursive calls to each nodes children.
+	
+	\begin{largecode}
+ lca(n, p, q):
+	if (n == null || n = q || n = q) return n
+	left  = lca(n->left, p, q)
+	right = lca(n->right, p, q)
+	
+	if (left and right) return n
+	return (left) ? left : right
+	\end{largecode}
+	\begin{remark} Determining the LCA in a {\it search} tree is trivial. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Binary Tree, Lowest Common Ancestor, Recursion}
+\end{note}
+
+\begin{note}{Validate Postorder}
+	Given an array of nodes \incode{A}, determine whether it corresponds
+	to a valid postorder traversal of some binary tree.
+	
+	\begin{largecode}
+ input: [9,3,4,#,#,1,#,#,2,#,6,#,#]
+ solution: true
+	\end{largecode}
+	\bf Solution \hyperref[note:Validate Postorder Algorithm]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Validate Postorder Algorithm}
+	To determine whether \incode{A} is a \hyperref[note:Validate Postorder]{\it validate postorder} traversal,
+	we use a stack \incode{s} which progressively replaces leaves by \incode{\#}.
+	\begin{largecode}
+for n in nodes:
+	if (n == "#")
+		while (s and s[-1] == "#" and s[-2] != "#")
+			s.pop(); s.pop()
+	s.push(n)
+ return s == ["#"]
+	\end{largecode}
+	\begin{remark} Alternatively count the in- and out-degree difference. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Binary Tree, Postorder, Traversal}
+\end{note}
+
+\begin{note}{Sum Root to Leaf Numbers}
+	Given the \incode{root} to a binary tree of nodes \incode{0-9}, every path $p$
+	from the root to a leaf defines a number. Return their sum.
+	
+	\begin{largecode}
+ input: [1, 2, 3, 1, $\emptyset$, 5, 9]
+ solution: 395 // 121 + 135 + 139
+	\end{largecode}
+	\bf Solution \hyperref[note:Sum Roof to Leaf Numbers Solution]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Sum Roof to Leaf Numbers Solution}
+	To determine the \hyperref[note:Sum Root to Leaf Numbers]{\it sum of root-to-leaf numbers} we use
+	simple \hyperref[note:Depth-First Search]{\it depth-first} recursion with an accumulator.
+	
+	\begin{largecode}
+ sum(node, acc):
+ 	if (node == NULL) return 0
+ 	if (node is leaf) return acc + node.val
+	
+	acc = (acc + node.val ) * 10
+	return sum(node.left, acc) + sum(node.right, acc)
+	\end{largecode}
+	\begin{remark} \incode{acc} could also just be a reference, which we would need to restore it to
+		its original value at the end of each call. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Binary Tree, Depth-First Search, Recursion}
+\end{note}
+
+\begin{note}{Minimum Height Tree}
+	Given an undirected acyclic graph with \incode{n} nodes and a list of edges \incode{(i, j)}
+	determine all nodes which, if taken to be the root, result in a tree with minimum height.
+
+	\begin{largecode}
+ input: n = 4, e = [[1, 0], [1, 2], [1, 3]]
+ solution: [1]  // height of 1
+	\end{largecode}
+	\bf Solution \hyperref[note:Minimum Height Tree Algorithm]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Minimum Height Tree Algorithm}
+	To determine the \hyperref[note:Minimum Height Tree]{\it minimum height trees}
+	we iteratively identify all leaves and delete them. The last one or two nodes that remain
+	must be the optimal roots.
+
+	\begin{largecode}
+ while (graph.size > 2)
+	remove all leaves
+ return graph.nodes
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Solution, Minimum Height Tree}
+\end{note}
+
+% Course Schedule maybe, although that's so obvious
+
+% Fake Head for Linked Lists == Sentinel basically.
+% Labels <= when you have element -> set(elements) and all those elements also -> set(...)
+
+\begin{note}{Two Stock Transactions}
+	Given an array where \incode{p[i]} is the price of some stock on day \incode{i},
+	maximize the profit with {\it two non-overlapping} transactions.
+	
+	\begin{largecode}
+ input: [3,3,5,0,0,3,1,4]
+ solution: 6  // 0->3 + 1->4
+	\end{largecode}
+	\bf Solution \hyperref[note:Linear Two Stock Optimization]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Linear Two Stock Optimization}
+	Determine the maximum profit of \hyperref[note:Two Stock Transactions]{\it two stock transactions}
+	by building \incode{left[i]} and \incode{right[i]} representing the maximum profit with a single transaction
+	respectively before and after day \incode{i}.
+	
+	\begin{largecode}
+ highest_price = p[n-1]
+ for (i from n-2 to 0)
+ 	highest_price = max(p[i], highest_price)
+	right[i] = max(right[i+1], highest_price - p[i])
+
+ lowest_price = p[0]
+ for (i from 1 to n-1)
+	lowest_price = min(p[i], lowest_price)
+	left[i] = max(left[i-1], p[i] - lowest_price)
+	
+ return max(left[i] + right[i] for i from 0 to n-1)
+	\end{largecode}
+	
+	\begin{remark}
+		This also solves the {\it single stock transaction} problem.
+		With {\it unlimited} stock transactions buy at lows, and sell at highs.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Dynamic Programming, Stock}
 \end{note}
 
 \end{document}
