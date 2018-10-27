@@ -1,6 +1,7 @@
 \documentclass{cognito}
 \usepackage{lmodern}
 \usepackage{mathtools}
+\usepackage{textpos}
 
 \begin{document}
 
@@ -62,6 +63,52 @@
 	\vspace{-5pt}
 	\tags{C++, Data Structures, Access}
 \end{note} 
+
+\begin{note}{constexpr}
+	\incode{constexpr}
+\end{note}
+
+
+\begin{note}{Sorting}
+%	\begin{textblock*}{\textwidth}(8.25cm,-0.7cm)
+%		\incode{<algorithm>}
+%	\end{textblock*}
+	\incode{std:sort} can be used to sort elements in a range defined by random access \hyperref[note:Iterators]{\it iterators} \incode{[first, last)}
+	using either the default \incode{operator<} or a custom \emph{binary} function \incode{cmp}.
+	\begin{largecode}
+ #include <algorithm>
+ bool cmp(const Type1 &a, const Type2 &b) { ... }
+ sort(c.begin(), c.end())
+ sort(c.begin()+4, c.end(), cmp)
+	\end{largecode}
+	Performs $O(n \log_2 n)$ comparison according to the {\tt C++} standard. Implementations differ
+	but usually use {\it introsort} or hybrids.
+	\begin{remark} For a \emph{stable} sorting algorithm, use \incode{stable\_sort}. \end{remark} \vspace{-5pt}
+	\tags{C++, Sorting}
+\end{note}
+
+\begin{note}{String Stream}
+	Type \incode{stringstream} defined in \incode{sstream} allows
+	a string to be treated like a stream, thus allowing extraction \incode{<<} and insertion \incode{>>}.
+	\begin{largecode}
+ #include <iostream>
+ #include <sstream>
+ string s, int i;
+ getline(cin, s);
+ stringstream(s) >> i;
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{C++, I/O, Streams, Strings}
+\end{note}
+
+% const int * p;  read-only pointer, we can't change the int. We can change p though.
+% int * const p; can't point elsewhere, but we can change the int.
+
+\begin{note}{Reverse}
+	\begin{largecode}
+ std:reverse(c.begin(), c.end())
+ 	\end{largecode}
+\end{note}
 
 \begin{note}{Vector}
 	\tags{C++, Data Structures}

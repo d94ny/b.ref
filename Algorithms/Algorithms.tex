@@ -2028,6 +2028,67 @@ for n in nodes:
 	\tags{Solution, Dynamic Programming, Stock}
 \end{note}
 
+\begin{note}{First Missing Positive}
+	Given an array \incode{A}, determine the lowest strictly positive integer not present in the array
+	in \emph{linear} time and constant extra memory.
+
+	\begin{largecode}
+ input: [3,-8,4,7,-1,1]
+ solution: 2
+	\end{largecode}
+	\bf Solution \hyperref[note:Linear Missing Positive]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Linear Missing Positive}
+	Determine the \hyperref[note:First Missing Positive]{\it first missing positive} of \incode{A} by
+	placing each positive element \incode{x} into position \incode{x-1}.
+	
+	\begin{largecode}
+ for (i from 0 to n-1)
+ 	while (A[i] != i+1)
+		if (i <= 0 or i >= n) break
+		if (A[i] == A[A[i] - 1]) break  // circle
+		swap A[i] and A[A[i] - 1]
+		
+ for (i from 0 to n-1) if (A[i] != i+1) return i+1
+ return n+1
+	\end{largecode}
+	\begin{remark} Linear time complexity because every element \incode{A[i]} is placed at its correct position exactly once. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution, First Missing Positive, Swapping, Sort}
+\end{note}
+
+\begin{note}{Sliding Window Maximum}
+	Given an array of integers \incode{A} and the size \incode{k} of a sliding window,
+	return the maximum inside each window.
+
+	\begin{largecode}
+ input: [1, 8, -1, 4, 2, 5, 3, 6, 9], k = 3
+ solution: [8, 8, 4, 5, 5, 6, 9]
+	\end{largecode}
+	\bf Solution \hyperref[note:Sliding Window Maximum Algorithm]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Sliding Window Maximum}
+	To determine the \hyperref[note:Sliding Window Maximum]{\it maxima in a sliding window} in linear time we
+	use a \emph{double-ended} queue \incode{Q} whose front will alway contain the current maximum.
+	For every new element \incode{A[i]} we remove all elements from the back which are smaller.
+
+	\begin{largecode}
+ Q = deque()  // double-ended
+ for (i from 0 to n-1)
+ 	if (Q and Q.front() == i - k) Q.pop_front()
+	while (Q and A[Q.back()] <= A[i]) Q.pop_back()
+	
+	Q.push_back(i)
+	if (i + 1 >= k) print A[Q.front()]
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Solution, Sliding Window, Queue, Double-Ended Queue}
+\end{note}
+
 \end{document}
 
 
