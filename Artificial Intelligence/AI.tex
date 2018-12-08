@@ -2,6 +2,7 @@
 \usepackage{lmodern}
 \usepackage{mathtools}
 \usepackage{bm}
+\usepackage{dsfont}
 
 \begin{document}
 
@@ -36,16 +37,17 @@
 \begin{note}{Graph Search}
 	Graph search is a general search algorithm
 	similar to  tree search that remembers his past exploration.
-	\begin{code}
+	\begin{largecode}
 explored = Set(); frontier = {start state}
 while (frontier):
- 	x = frontier.pop(strategy)
+ 	x = frontier.pop_using(strategy)
 	if (x is goal state): return solution
 	explored.add(x)
 	for (n in x.successors() if n not in explored):
 		frontier.add(n)  # or update
 return False
-	\end{code}
+	\end{largecode}
+	\vspace{-5pt}
 	\tags{Search, Path Search, Uninformed Search}
 \end{note}
 
@@ -243,6 +245,14 @@ return False
 		\item All the rest ...
 	\end{itemize}
 	\tags{Search, Local Search \& Optimization}
+\end{answer}
+
+\begin{answer}{Todo}
+	\begin{enumerate}
+		\item Reorganize Optimization
+		\item More ML vocabulary
+		\item SGD etc
+	\end{enumerate}
 \end{answer}
 
 %%% Adverserial Search
@@ -854,15 +864,40 @@ for $X_i$ in Topologic[$X_1$, ..., $X_n$] do
 
 \begin{question}{Todo}
 	\begin{itemize}
+		\item Clear Categories (unsupervised, reinforcement...)
+		\item Generalization
+		\item Cross-Validation
+		\item Momentum SGD
+		\item AdaGrad
+		\item RMSProp
 		\item Genetic Algorithm
 		\item Neural Networks
-		\item Multi-Layer Perceptron
 		\item Back-propagation
-		\item SVM
 		\item Gradient Boosting Machines
 		\item CNNets
-		\item K-Means
-		\item Logistic Regression
+		\item k-Means
+		\item Lloyd's Algorithm
+		\item Logistic Regression - produces probabilities (what are logits?)
+		\item sigmoid
+		\item k-Nearest Neighbors
+		\item PCA
+		\item Dimension Reduction (SVD,...)
+		\item Clustering
+		\item Unsupervised Learning
+		\item GMM
+		\item Locality Sensitive Hashing
+		\item GAN (Generative adversarial network)
+		\item Keras example of NN
+		\item Log-loss or cross entropy
+		\item Feature Engineering
+		\item Feature Crosses
+		\item Embeddings
+		\item Precision + Recall 
+		\item Discriminant Analysis
+		\item Maximum Likelihood Estiamtion (MLE)
+		\item maximum a posteriori estimation (MAP)
+		\item Expectation Maximization (EM)
+		\item Naive Bayes Classifier
 	\end{itemize}
 \end{question}
 
@@ -894,15 +929,278 @@ for $X_i$ in Topologic[$X_1$, ..., $X_n$] do
 %% how to compile it, then train/fit it! ~ similar to R
 
 \begin{note}{Softmax Function}
-	The softmax or {\it normalized exponential} function $\sigma$ is a generalization of the {\it logit function}
+	The softmax or {\it normalized exponential} function $\sigma$ is a generalization of the {\it logistic function}
 	which "smashes" an arbitrary vector to a categorical distribution, $\sigma : \bm z \in \mathbb{R}^K \to (0, 1)^K$.
 	$$
 		\sigma(\bm z)_i = \frac{e^{z_i}}{\sum_j e^{z_j}}, \quad \quad \sum_i \sigma(\bm z)_i = 1
 	$$
-	\begin{remark} $\sigma$ is used is {\it multiclass classification},  linear discriminant analysis, naive Bayes classifiers, and artificial neural networks.
+	\begin{remark} $\sigma$ is used in probabilistic \hyperref[note:Supervised Learning]{\it multiclass classification}. %,  linear discriminant analysis, naive Bayes classifiers. %, and artificial neural networks.
 	\end{remark}
 	\vspace{-5pt}
 	\tags{Deep Learning, Neural Network, Activation}
+\end{note}
+
+\begin{note}{Sigmoid Function}
+	The sigmoid function is the inverse of the \emph{logit} function
+	and maps arbitrary real values into the unit interval, $f:  \mathbb{R} \to [0, 1]$.
+	$$
+		f(x) = \frac{1}{1+ e^{-x}} = \frac{e^x}{1 + e^x}
+	$$
+	\begin{remark} Used in \hyperref[note:Logistic Regression]{\it logistic regression} for probabilistic classification.\end{remark}
+	\vspace{-5pt}
+	\tags{Logistic Regression}
+\end{note}
+
+\begin{note}{Gradient Descent}
+	The \emph{optimization} problem of minimizing a function $f(\bm w)$ can be solved
+	using gradient descent, i.e. applying the negative gradient
+	proportionally to some \emph{learning rate} $\eta$.
+	$$
+		\bm w^{(t+1)} \leftarrow \bm w^{(t)} - \eta \nabla f(\bm w^{(t)})
+	$$
+	\begin{remark} Due to computational inefficiency of determining $\nabla f(\bm w)$,
+		\hyperref[note:Stochastic Gradient Descent]{\it stochastic or mini-batch} gradient descent
+		is preferred in practice. \end{remark}
+	\begin{remark} In machine learning, loss functions $l(\bm\theta \vert \bm X, \bm y)$ are defined for model parameters $\bm \theta$
+		given training data $(\bm X, \bm y)$.\end{remark}
+	\vspace{-5pt}
+	\tags{Optimization, Gradient Descent}
+\end{note}
+
+\begin{note}{Stochastic Gradient Descent}
+	Given an additive loss $f(\bm w) = \alpha \sum f_i (\bm w)$,
+	stochastic \hyperref[note:Gradient Descent]{\it gradient descent} iteratively applies the gradient for a single function $f_i$:
+	$$
+		\bm w^{(t+1)} \leftarrow \bm w^{(t)} - \eta \nabla f_i(\bm w^{(t)})
+	$$
+	Using the gradient $\nabla f_S$ for the loss incurred by a larger subset $f_S = \sum_{S} f_i$ is referred to as \emph{mini-batch} SGD.
+	\begin{remark}
+		In practice the loss function is additive in \emph{sample points},
+		thus $f_i$ corresponds to the isolated loss incurred from $\bm x_i$.
+		Therefore gradient descent becomes an \emph{online} optimization algorithm.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Search, Optimization, Gradient Descent, SGD}
+\end{note}
+
+\begin{note}{Supervised Learning}
+	A supervised learning problem is defined by training data $(\bm X, \bm y)$ of
+	feature vectors $\bm x_i$ and response variables $y_i = f(\bm x_i) + \epsilon$.
+	\begin{mdframed}[linecolor=black!25!white]
+		The goal is to find a \emph{good} function estimate $\hat f$ for $f$.
+	\end{mdframed}
+	\begin{description}
+		\item[Numerical] values $y_i$ $\longrightarrow$ \emph{regression} analysis.
+		\item[Categorical] labels $y_i$ $\longrightarrow$ \emph{classification} problem.
+	\end{description}
+	
+	Parametric methods assume an underlying model
+	$f(\bm x) = m(\bm x \vert \bm \theta)$ and learn the parameters $\hat{\bm \theta}$
+	by minimizing a \emph{loss} function $l(\bm \theta \vert \bm X, \bm y)$.
+	
+	\tags{Supervised Learning, Regression, Classification, Estimation}
+\end{note}
+
+\begin{draft}{Supervised Learning Todo}
+	\begin{itemize}
+		\item Generalization Error
+		\item Over-fitting
+	\end{itemize}
+\end{draft}
+
+\begin{note}{Regularization}
+	Regularization is the process of penalizing the complexity of a model $\hat f$ to prevent \emph{overfitting} to training data $(\bm X, \bm y)$.
+	$$ g(\bm \theta \:\vert\: \bm X, \bm y) = l(\bm \theta \:\vert\: \bm X, \bm y ) + \lambda R(\bm \theta)$$
+	where $g$ is a regularized objective function applying a weighted regularizer term $R(\cdot)$ to a given loss function $l$.
+	\begin{example}
+		\hyperref[note:Tikhonov Regularization]{\it Tikhonov}, 
+		\hyperref[note:Lasso Regularization]{\it Lasso} and
+		\hyperref[note:Elastic Net Regularization]{\it Elastic Net}.
+	\end{example}
+	\vspace{-5pt}
+	\tags{Optimization, Generalization, Overfitting}
+\end{note}
+
+\begin{note}{Bias-Variance Tradeoff}
+	The bias-variance decomposition in \hyperref[note:Supervised Learning]{\it supervised learning}
+	is expressed through the expected generalization error:
+	$$
+		\underbrace{\mathds{E}[(f(x) - \hat{f}(x))^2]}_{\text{MSE}(x)} = (\underbrace{\mathds{E}[\hat{f}(x)] - f(x)}_{\text{Bias}})^2
+		+ \underbrace{\mathds{E}[\hat{f}(x)^2] - E[\hat{f}(x)]^2}_{\text{Var}(\hat{f}(x))}
+	$$
+	\begin{remark} Optimizing this trade-off is called \hyperref[note:Regularization]{\it regularization}.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Supervised Learning}
+\end{note}
+
+\begin{note}{Tikhonov Regularization}
+	Also known as \emph{ridge regression} and \emph{weight decay},
+	the Tikhonov method applies a $L_2$ norm-penality \hyperref[note:Regularization]{\it regularization} term.
+	$$
+		 g(\bm \theta \:\vert\: \bm X, \bm y) = l(\bm \theta \:\vert\: \bm X, \bm y ) + \lambda \| \bm \Gamma \bm \theta \|_2^2
+	$$
+	where $\bm \Gamma$ is the Tikhonov matrix. Using the identiy matrix $\bm \Gamma = \alpha \bm I$ is
+	known as $L_2$ regularization.
+	
+	\tags{Optimization, Regularization}
+\end{note}
+
+\begin{note}{Lasso Regularization}
+	Also known as $L_1$ regularization, the Lasso method performs variable selection and \hyperref[note:Regularization]{\it regularization}
+	using $L_1$ norm-penalty.
+	$$
+		 g(\bm \theta \:\vert\: \bm X, \bm y) = l(\bm \theta \:\vert\: \bm X, \bm y ) + \lambda \| \bm \theta \|_1
+	$$
+	\vspace{-10pt}
+	\tags{Optimization, Regularization}
+\end{note}
+
+\begin{note}{Elastic Net Regularization}
+	Elastic Net is a \hyperref[note:Regularization]{\it regularization} method that linearly
+	combines the $L_1$ and $L_2$ norm penalties of \hyperref[note:Tikhonov Regularization]{\it Tikhonov} and 
+	\hyperref[note:Lasso Regularization]{\it Lasso}.
+	$$
+		 g(\bm \theta \:\vert\: \bm X, \bm y) = l(\bm \theta \:\vert\: \bm X, \bm y ) + \lambda_1 \| \bm \theta \|_1 + \lambda_2 \| \bm \theta \|_2^2
+	$$
+	\vspace{-10pt}
+	\tags{Optimization, Regularization}
+\end{note}
+
+\begin{note}{Perceptron}
+	A perceptron $\hat f$ is a non-probabilistic linear \hyperref[note:Supervised Learning]{\it binary classifier} for feature vectors $\bm x \in \mathbb{R}^n$
+	using a \emph{decision boundary} defined by a weight vector $\bm w \in \mathbb{R}^n$ and a bias $b \in \mathbb{R}$. 
+	$$ \hat f(\bm x) = \text{sign}(\bm w^\intercal \bm x + b) $$
+%	Learning perceptron $\hat f$ using (\hyperref[note:Stochastic Gradient Descent]{\it stochastic}) \hyperref[note:Gradient Descent]{\it gradient descent}
+%	on some loss function $l(\bm w, b \:\vert\: \bm X, \bm y)$ requires no learning rate $\eta$.
+	\begin{remark}
+		A perceptron is equivalent to an \hyperref[note:Artificial Neural Network]{\it artificial network} neuron with a \emph{heaviside} activation function.
+		%\emph{Multi-layer} perceptrons are equivalent to feedforward \emph{neural networks} with a \emph{heaviside} activation function.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Supervised Learning, Classification}
+\end{note}
+
+\begin{note}{Support Vector Machine}
+	An SVM $\hat f$ %, also called \hyperref[note:Perceptron]{\it perceptron} of \emph{optimal stability}
+	is a non-probabilistic linear \hyperref[note:Supervised Learning]{\it binary classifier}
+	for feature vectors $\bm x \in \mathbb{R}^n$ using a \emph{decision hyperplane} $(\bm w, b) \in \mathbb{R}^n \times \mathbb{R}$
+	with maximized \emph{decision margin} $2/\| \bm w\|$.
+	$$ \hat f(\bm x) = \text{sign}(\bm w^\intercal \bm x + b) $$
+	Support Vector Machines are learned with either \hyperref[note:Hard Margin SVM]{\it hard} or \hyperref[note:Soft Margin SVM]{\it soft} margins
+	depending on the linear-separability of the data $\bm X$.
+	
+	\begin{remark}
+		Also called \hyperref[note:Perceptron]{\it perceptron} of \emph{optimal stability}.
+	\end{remark}
+	\vspace{-5pt}
+	\tags{Supervised Learning, Classification, Linear Classifier, Binary Classifier, SVM}
+\end{note}
+
+\begin{note}{Hard Margin SVM}
+	For linearly separable classification problems, a \hyperref[note:Support Vector Machine]{\it Support Vector Machine} can be trained
+	to maximize the hyperplane margin $2/\| \bm w\|$ on a normalized dataset as follows:
+	$$
+		\min_{\bm w} \, \| \bm w \| \quad \text{ s.t } \quad y_i \left(\bm w^\intercal \bm x_i + b\right) \geq 1 \quad \forall \bm x_i \in \bm X
+	$$
+	\vspace{-10pt}
+	\tags{Supervised Learning, Classification, Linear Classifier, Binary Classifier, SVM, Hard Margin}
+\end{note}
+
+\begin{note}{Soft Margin SVM}
+	For linearly inseparable classification problems, a \hyperref[note:Support Vector Machine]{\it Support Vector Machine} can be trained
+	with a soft margin by introducing \emph{hinge} loss instead of hard separability constraints.
+	$$
+		\min_{\bm w} \, \lambda \| \bm w \|  +  \frac{1}{n} \sum_{i} \max \left\{0, 1 - y_i \left(\bm w^\intercal \bm x_i + b\right)\right\} 
+	$$
+%	This formulation is called the regularized hinge loss minimization.
+	This can be solved using sub-\hyperref[note:Gradient Descent]{\it gradient descent}, or 
+	a norm constrained formulation can be used for projected gradient descent.
+	
+	\tags{Supervised Learning, Classification, Linear Classifier, Binary Classifier, SVM, Hard Margin}
+\end{note}
+
+\begin{draft}{SVM Todo}
+	\begin{itemize}
+		\item Kernel Trick for Hard Margin SVM
+		\item Optimization of SVM (using norm-constrained)
+		\item Online SVM?
+		\item How do we learn Hard Margin SVM?
+	\end{itemize}
+\end{draft}
+
+\begin{note}{Linear Regression}
+	Linear regression is a  \hyperref[note:Supervised Learning]{\it regression analysis} method
+	assuming a linear relationship between the response variables $y_i$ and the feature vectors $\bm x_i$.
+	$$ f(\bm x) = \bm\beta^\intercal \bm x \quad \text{i.e.} \quad \bm y = \bm X \bm\beta + \bm \epsilon $$
+%	The model parameters are usually fitted by minimizing the sum of squared residuals, corresponding to by the {\it least squares estimator}.
+%	$$ \hat {\bm \beta} = \text{arg}\max_{\bm\beta} \| \bm y - \bm X \bm\beta \|^2 $$
+	The model parameters are usually fitted by minimizing the sum of squared residuals, corresponding to by the {\it least squares estimator}.
+	$$ \hat {\bm \beta} = \text{arg}\max_{\bm\beta} \| \bm y - \bm X \bm\beta \|^2 $$
+	\vspace{-10pt}
+	%\begin{remark} Equivalent to a \hyperref[note:Artificial Neural Network]{\it artificial network} neuron without activation. \end{remark}
+	\tags{Supervised Learning, Regression, Linear Regression, Least Squares Estimator}
+\end{note}
+
+\begin{note}{Logistic Regression}
+	Logistic regression produces a probabilistic \hyperref[note:Supervised Learning]{\it binary classifier}
+	by applying the \hyperref[note:Sigmoid Function]{\it sigmoid} function to a linear model $\bm \beta$.
+	$$
+		\hat \pi(\bm x) = \left[1 + e^{- \bm \beta^\intercal \bm x} \right]^{-1}
+	$$
+	The decision threshold $\tau$ is chosen based on \hyperref[note:Precision]{\it precision} and \hyperref[note:Recall]{\it recall}.
+	$\bm \beta$ can be estimated by \hyperref[note:Maximum Likelihood Estimator]{\it maximum likelihood}
+	i.e. minimizing the negative log-likelihood, by using for example \hyperref[note:Gradient Descent]{\it gradient descent}.
+	$$
+		l(\bm \beta \vert \bm X, \bm y) = - \bm y^\intercal \log \hat {\bm \pi}(\bm X) - (\bm 1 - \bm y)^\intercal \log \left(\bm 1 - \hat {\bm \pi}(\bm X) \right)
+	$$
+	\begin{remark} This cost function $l$ is an instance of \hyperref[note:Cross Entropy]{\it cross entropy}. \end{remark}
+	\vspace{-5pt}
+	\tags{Supervised Learning, Classification, Linear Classifier, Binary Classifier, Probabilistic Classifier}
+\end{note}
+
+\begin{note}{Cross Entropy}
+	The cross entropy $H$ is a measure quantifying the distance between two probability distributions $p$ and $q$. 
+	For a discrete set $\bm X$:
+	$$
+		H(p, q) = - \sum_{\bm x} p(\bm x) \log q(\bm x)
+	$$
+	\begin{remark}
+		Generalization of negative \hyperref[note:Logistic Regression]{\it log-likelihood}.
+		Used as a loss function to train probabilistic \hyperref[note:Supervised Learning]{\it classifiers}.
+	\end{remark}
+	\tags{Optimization, Supervised Learning, Classification, Probabilistic Classification}
+\end{note}
+
+\begin{note}{Multinomial Logistic Regression}
+	Multinomial logistic regression generalizes \hyperref[note:Logistic Regression]{\it logistic regression} for multiple classes
+	using the \hyperref[note:Softmax Function]{\it softmax} function with $\bm B \in \mathbb{R}^{N \times K}$.
+	$$
+		\hat \pi(y = k \:\vert\: \bm x) = \sigma(\bm B \bm x)_k = \frac{e^{\bm \beta_k^\intercal \bm x}}{\sum_j e^{\bm \beta_j^\intercal \bm x}}
+	$$
+	$\bm B$ can again be fitted using maximum-likelihood estimation which equivalently minimizes the \hyperref[note:Cross Entropy]{\it cross entropy}.
+	%Classification is then performed using $\text{arg}\max_k \hat \pi(y = k \:\vert\: \bm x)$.
+	\begin{remark} Equivalent to a single layer \hyperref[note:Artificial Neural Network]{\it neural network} classifier. \end{remark}
+	\vspace{-5pt}
+	\tags{Supervised Learning, Classification, Linear Classifier, Multiclass Classifier, Probabilistic Classifier}
+\end{note}
+
+\begin{note}{Linear Discriminant Analysis}
+	LDA is used for probabilistic \hyperref[note:Supervised Learning]{\it multi-class classification} by
+	assuming a $p$-dimensional Gaussian distribution 
+	$ ( \bm x \:\vert\: y = j ) \sim \mathcal{N}_p(\bm \mu_j, \bm\Sigma) $.
+	$$
+		\hat\pi_k(\bm x) = \frac{f_k(\bm x) p_k}{\sum_j f_j(\bm x) p_j}
+	$$
+	where $p_j = P(y = j)$ and $f_j$ is the density of $\mathcal{N}_p(\bm \mu_j, \bm\Sigma)$.
+	Standard \emph{moment estimators} can be used for $\hat{\bm \mu_j}, \hat{\bm\Sigma}$ and $\hat p_j$.
+	The decision function $\hat c(\bm x) = \text{arg}\max_j \hat\delta_j(\bm x)$ is then linear in predictor $\bm x$:
+	$$
+		\hat\delta_k(\bm x) = (\bm x - \hat{\bm \mu}_j)^\intercal \hat{\bm\Sigma}^{-1} \hat{\bm\mu}_j + \log \hat p_j
+	$$
+	\begin{remark} Without the homoscedasticity $\bm\Sigma$ assumption we get \emph{quadratic} discriminant analysis. \end{remark}
+	\vspace{-5pt}
+	\tags{Supervised Learning, Classification}
 \end{note}
 
 %% Activation Functions:
@@ -923,6 +1221,22 @@ for $X_i$ in Topologic[$X_1$, ..., $X_n$] do
 
 % Convolutional Layers
 % Max pooling and stuff
+
+\begin{draft}{Keras Neural Network}
+	The following is a very high-level example of a \hyperref[note:Artificial Neural Network]{\it neural network}
+	built and trained using \incode{keras}.
+	\begin{largecode}
+model = tf.keras.models.Sequential([ ... ])
+model.compile(optimizer='adam',
+	loss='sparse_categorical_crossentropy',
+	metrics=['accuracy'])
+
+model.fit(x_train, y_train, epochs=5)
+model.evaluate(x_test, y_test)
+	\end{largecode}
+	\vspace{-5pt}
+	\tags{Keras, Deep Learning, Python, Example}
+\end{draft}
 
 \end{document}
 

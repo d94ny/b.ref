@@ -17,6 +17,7 @@
 	\tags{Daniel Balle 2018}
 \end{note}
 
+% -------------------------
 % Multiple Linear Regression
 
 \begin{note}{Multiple Linear Regression}
@@ -79,10 +80,6 @@ fitted <- lm(formula = LOGRUT ~ ., data = asphalt1)
 \begin{note}{Bias-Variance Tradeoff}
 	The bias-variance decomposition
 	for any \emph{supervised} learning task of $y = f(x) + \epsilon$ is the expected generalization error:
-%	$$
-%		\mathds{E}[(y - \hat{f}(x))^2] = (\underbrace{\mathds{E}[\hat{f}(x) - f(x)]}_{\text{bias}})^2
-%		+ \underbrace{\mathds{E}[\hat{f}(x)^2] - E[\hat{f}(x)]^2}_{\text{Var}(\hat{f}(x))}
-%	$$
 	$$
 		\underbrace{\mathds{E}[(f(x) - \hat{f}(x))^2]}_{\text{MSE}(x)} = (\underbrace{\mathds{E}[\hat{f}(x)] - f(x)}_{\text{Bias}})^2
 		+ \underbrace{\mathds{E}[\hat{f}(x)^2] - E[\hat{f}(x)]^2}_{\text{Var}(\hat{f}(x))}
@@ -97,6 +94,9 @@ fitted <- lm(formula = LOGRUT ~ ., data = asphalt1)
 % Tests and Confidence Intervals for parameters
 % Model Selection
 % R code?
+
+% -------------------------
+% Non-parametric Density Estimation
 
 \begin{note}{Kernel Density Estimation}
 	Given realizations $X_i \in \mathds{R} \sim F$, the nonparametric kernel density estimator $\hat{f}$
