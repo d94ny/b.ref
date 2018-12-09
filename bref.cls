@@ -60,6 +60,7 @@
 \colorlet{noteColor}{white}
 \colorlet{questionColor}{white!90!blue}
 \colorlet{answerColor}{white!90!green}
+\colorlet{draftColor}{white!90!yellow}
 \colorlet{codeColor}{black!5!white}
 \colorlet{frameColor}{black!25!white}
 \colorlet{codeFontColor}{black!85!white}
@@ -126,6 +127,7 @@
 \newenvironment{note}[1]{\begin{systemNote}{#1}{noteColor}}{\end{systemNote}}
 \newenvironment{question}[1]{\begin{systemNote}{#1}{questionColor}}{\end{systemNote}}
 \newenvironment{answer}[1]{\begin{systemNote}{#1}{answerColor}}{\end{systemNote}}
+\newenvironment{draft}[1]{\begin{systemNote}{#1}{draftColor}}{\end{systemNote}}
 
 
 % Additional Stuff
@@ -158,6 +160,13 @@
 	\hrule\vspace{3pt} % between hrule and tags
 	\tt #1
 	\vspace{-8pt} % after tags
+}
+
+% Favorite
+\newcommand{\favorite}{
+	\begin{textblock*}{5cm}(13.2cm,2.8cm) % {block width} (coords) 
+   		\color{black!20!yellow}$\bigstar$
+	\end{textblock*}
 }
 
 % Daniel Balle (c) 2016-2018

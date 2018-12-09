@@ -1,6 +1,7 @@
 \documentclass{cognito}
 \usepackage{lmodern}
 \usepackage{mathtools}
+\usepackage[absolute,overlay]{textpos}
 
 \begin{document}
 
@@ -1991,6 +1992,7 @@ for n in nodes:
 % Labels <= when you have element -> set(elements) and all those elements also -> set(...)
 
 \begin{note}{Two Stock Transactions}
+	\favorite
 	Given an array where \incode{p[i]} is the price of some stock on day \incode{i},
 	maximize the profit with {\it two non-overlapping} transactions.
 	
@@ -2184,20 +2186,68 @@ for n in nodes:
 	\tags{Solution, Famous Person}
 \end{note}
 
-\begin{note}{Type Conversion Queries}
-	\tags{Problem}
-\end{note}
-
 \begin{note}{User Group Relationships}
-	Given a map \incode{groups} mapping groups to a list
-	of users and groups, implement two efficient functions \incode{UsersInGroup}
-	and \incode{IsUserInGroup}.
+	Given a map \incode{input} mapping groups to a list
+	of users \emph{and} groups, expand the map to \incode{group:users}.
 	\begin{largecode}
  input: { g1: [u1, g2], g2: [u2], g3: [u3, g2] }
  solution: { g1: [u1, u2], g2: [u2], g3: [u3, u2] }
 	\end{largecode}
+	\bf Solution \hyperref[note:User Group Relationships DFS]{\solutionref}.
 	\tags{Problem}
 \end{note}
+
+\begin{note}{User Group Relationships DFS}
+	Given \hyperref[note:User Group Relationships]{\it group and user} relationships,
+	we can produce an expanded \incode{group:users} mapping in linear time by using \hyperref[note:Depth-First Search]{\it depth-first search}.
+	\begin{largecode}
+ visit(node, path):
+ 	if node.isUser():
+		for g in path: groups[g].add(node)
+	else if node not in path and not in groups:
+		groups[node] = set()
+		for e in input[node]: visit(e, path + [node]) 	
+	\end{largecode}
+	\vspace{-5pt}
+	\begin{remark} The code above also handles cycles. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution, DFS}
+\end{note}
+
+\begin{note}{Type Conversion Queries}
+	Given a list of type conversions \incode{(type1, type2, rate)},
+	implement a fast and space efficient \incode{convert} function.
+	\begin{largecode}
+ input: (USD,CHF,0.99), (kg,pound,2.204), (USD,GBP,0.79)
+ query: (CHF,GBP,2)  // solution: 1.59
+	\end{largecode}
+	\bf Solution \hyperref[note:Efficient Type Conversions]{\solutionref}.
+	\tags{Problem}
+\end{note}
+
+\begin{note}{Efficient Type Conversions}
+	To limit time and space complexity of \hyperref[note:Type Conversion Queries]{\it type conversion queries}
+	we use a \hyperref[note:Disjoint-Set Data Structure]{\it Union-Find} data structure to store only conversions to a \emph{master} or \emph{representative unit}
+	for each type family.
+	\begin{largecode}
+ s = { } 	    // type -> (master, rate)
+ families = { } // master -> set(types)
+ for (t1, t2, rate) in conversions:
+ 	if neither t1 nor t2 in s:
+		s[t1] = (t2, rate); s[t2] = (t2, 1); continue
+ 	if only t1 in s: s[t2] = (t1.master, 1/rate*t1.rate)
+	// ...
+	if t1.master != t2.master: union(t1, t2, rate)
+	\end{largecode}
+	\vspace{-5pt}
+	\begin{remark} The difficulty lies in the implementation of \incode{union}. \end{remark}
+	\vspace{-5pt}
+	\tags{Solution, Union-Find, Disjoint Set}
+\end{note}
+
+%\begin{note}{Weighted Sampling}
+%	\tags{Problem}
+%\end{note}
 
  %%%%%%%%%%%% SPECIAL
 
